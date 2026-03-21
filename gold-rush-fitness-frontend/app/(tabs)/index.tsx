@@ -109,9 +109,11 @@ export default function HomeScreen() {
         <View style={s.statsRow}>
           <View style={s.stepsCard}>
             <Text style={s.cardTitle}>TODAY'S MARCH</Text>
-            <StepRing steps={state.todaySteps} />
+            <View style={{ alignItems: 'center' }}>
+              <StepRing steps={state.todaySteps} />
+            </View>
             <TouchableOpacity
-              style={s.logButton}
+              style={[s.logButton, { alignSelf: 'flex-end' }]}
               onPress={() => router.push('/steps')}
             >
               <Text style={s.logButtonText}>View Details →</Text>
@@ -266,15 +268,16 @@ function makeStyles(colors: ReturnType<typeof useTheme>['colors']) {
       marginTop: 2,
     },
     statsRow: { flexDirection: 'row', gap: 10 },
+
     stepsCard: {
       flex: 1,
       backgroundColor: colors.bgCard,
       borderRadius: 10,
       padding: 12,
-      alignItems: 'center',
       borderWidth: 1,
       borderColor: colors.border,
       gap: 8,
+      justifyContent: 'space-between',  // ← pushes button to bottom
     },
     healthCard: {
       flex: 1.4,
