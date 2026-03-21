@@ -6,17 +6,21 @@ import {
   ScrollView,
   StyleSheet,
   TouchableOpacity,
+  Modal,
+  Pressable,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useTheme } from '../../context/ThemeContext';
 import { DAILY_STEP_GOAL, TRAIL_TOTAL_MILES } from '../../constants/theme';
 import { MOCK_STATE } from '../../constants/mockData';
 import StepRing from '../../components/StepRing';
+import WeekHeatmap from '../../components/WeekHeatmap';
 
 export default function StepsScreen() {
   const { colors } = useTheme();
   const state = MOCK_STATE;
   const [selectedGoal, setSelectedGoal] = useState(DAILY_STEP_GOAL);
+  const [showInfo, setShowInfo] = useState(false);
 
   const goals = [6000, 8000, 10000, 12000, 15000];
   const milesEarned = Math.floor(state.todaySteps / 2000);
@@ -31,13 +35,45 @@ export default function StepsScreen() {
       style={s.root}
     >
       <ScrollView contentContainerStyle={s.scroll} showsVerticalScrollIndicator={false}>
-        <Text style={s.screenTitle}>📍 Today's March</Text>
-        <Text style={s.screenSub}>Every step moves you down the trail</Text>
+
+        {/* Header row with info button */}
+        <View style={s.titleRow}>
+          <View>
+            <Text style={s.screenTitle}>Step Progress</Text>
+            <Text style={s.screenSub}>Every step moves you down the trail</Text>
+          </View>
+          <TouchableOpacity style={s.infoButton} onPress={() => setShowInfo(true)}>
+            <Text style={s.infoButtonText}>i</Text>
+          </TouchableOpacity>
+        </View>
+
+        {/* WEEK HEATMAP */}
+        <WeekHeatmap history={state.weekHistory} />
+
+        {/* Goal selector */}
+        <View style={s.goalCard}>
+          <Text style={s.cardTitle}>SET DAILY GOAL</Text>
+          <View style={s.goalRow}>
+            {goals.map((g) => (
+              <TouchableOpacity
+                key={g}
+                style={[s.goalChip, selectedGoal === g && s.goalChipActive]}
+                onPress={() => setSelectedGoal(g)}
+              >
+                <Text style={[s.goalChipText, selectedGoal === g && s.goalChipTextActive]}>
+                  {(g / 1000).toFixed(0)}k
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+          <Text style={s.goalHint}>
+            {selectedGoal.toLocaleString()} steps ≈ {Math.round(selectedGoal * 0.0005)} trail miles/day
+          </Text>
+        </View>
 
         {/* Main ring */}
         <View style={s.ringCard}>
           <StepRing steps={state.todaySteps} goal={selectedGoal} />
-
           <View style={s.statsGrid}>
             <View style={s.statBox}>
               <Text style={s.statValue}>{state.todaySteps.toLocaleString()}</Text>
@@ -58,69 +94,6 @@ export default function StepsScreen() {
           </View>
         </View>
 
-        {/* Goal selector */}
-        <View style={s.goalCard}>
-          <Text style={s.cardTitle}>SET DAILY GOAL</Text>
-          <View style={s.goalRow}>
-            {goals.map((g) => (
-              <TouchableOpacity
-                key={g}
-                style={[
-                  s.goalChip,
-                  selectedGoal === g && s.goalChipActive,
-                ]}
-                onPress={() => setSelectedGoal(g)}
-              >
-                <Text style={[
-                  s.goalChipText,
-                  selectedGoal === g && s.goalChipTextActive,
-                ]}>
-                  {(g / 1000).toFixed(0)}k
-                </Text>
-              </TouchableOpacity>
-            ))}
-          </View>
-          <Text style={s.goalHint}>
-            {selectedGoal.toLocaleString()} steps ≈ {Math.round(selectedGoal * 0.0005)} trail miles/day
-          </Text>
-        </View>
-
-        {/* Hourly breakdown */}
-        <View style={s.hourlyCard}>
-          <Text style={s.cardTitle}>HOURLY BREAKDOWN</Text>
-          <View style={s.hourlyBars}>
-            {[2, 5, 3, 8, 6, 4, 7, 9, 11, 8, 6, 7].map((val, i) => (
-              <View key={i} style={s.hourBarCol}>
-                <View style={s.hourBarTrack}>
-                  <View
-                    style={[
-                      s.hourBar,
-                      {
-                        height: `${(val / 12) * 100}%`,
-                        backgroundColor:
-                          val >= 9 ? colors.healthFull : val >= 6 ? colors.trailGold : colors.sunOrange,
-                      },
-                    ]}
-                  />
-                </View>
-                <Text style={s.hourLabel}>{6 + i}</Text>
-              </View>
-            ))}
-          </View>
-          <Text style={s.hourAxisLabel}>Hour of Day (AM/PM)</Text>
-        </View>
-
-        {/* Trail conversion note */}
-        <View style={s.conversionBox}>
-          <Text style={s.conversionTitle}>⬛ How Steps → Trail Miles</Text>
-          <Text style={s.conversionText}>
-            Every 2,000 steps = 1 trail mile.{'\n'}
-            At your goal of {selectedGoal.toLocaleString()} steps/day, you'd cover{' '}
-            {(selectedGoal / 2000).toFixed(0)} miles and reach Oregon in{' '}
-            {Math.ceil(TRAIL_TOTAL_MILES / (selectedGoal / 2000))} days.
-          </Text>
-        </View>
-
         {/* Connect health app */}
         <TouchableOpacity style={s.connectButton}>
           <Text style={s.connectIcon}>📱</Text>
@@ -133,6 +106,51 @@ export default function StepsScreen() {
           <Text style={s.connectArrow}>→</Text>
         </TouchableOpacity>
       </ScrollView>
+
+      {/* Info modal */}
+      <Modal
+        visible={showInfo}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setShowInfo(false)}
+      >
+        <Pressable style={s.modalOverlay} onPress={() => setShowInfo(false)}>
+          <Pressable style={s.modalCard} onPress={() => {}}>
+            <View style={s.modalHeader}>
+              <View style={s.modalInfoIcon}>
+                <Text style={s.modalInfoIconText}>i</Text>
+              </View>
+              <Text style={s.modalTitle}>Steps → Trail Miles</Text>
+              <TouchableOpacity onPress={() => setShowInfo(false)} style={s.closeButton}>
+                <Text style={s.closeButtonText}>✕</Text>
+              </TouchableOpacity>
+            </View>
+
+            <View style={s.modalDivider} />
+
+            <View style={s.modalRow}>
+              <Text style={s.modalEmoji}>👢</Text>
+              <Text style={s.modalText}>Every <Text style={s.modalHighlight}>2,000 steps</Text> = 1 trail mile</Text>
+            </View>
+            <View style={s.modalRow}>
+              <Text style={s.modalEmoji}>🎯</Text>
+              <Text style={s.modalText}>At <Text style={s.modalHighlight}>{selectedGoal.toLocaleString()} steps/day</Text> you cover {(selectedGoal / 2000).toFixed(0)} miles</Text>
+            </View>
+            <View style={s.modalRow}>
+              <Text style={s.modalEmoji}>🗺️</Text>
+              <Text style={s.modalText}>Oregon City is <Text style={s.modalHighlight}>{TRAIL_TOTAL_MILES.toLocaleString()} miles</Text> away</Text>
+            </View>
+            <View style={s.modalRow}>
+              <Text style={s.modalEmoji}>📅</Text>
+              <Text style={s.modalText}>At this goal, you'd arrive in <Text style={s.modalHighlight}>{Math.ceil(TRAIL_TOTAL_MILES / (selectedGoal / 2000))} days</Text></Text>
+            </View>
+
+            <TouchableOpacity style={s.modalDismiss} onPress={() => setShowInfo(false)}>
+              <Text style={s.modalDismissText}>Got it</Text>
+            </TouchableOpacity>
+          </Pressable>
+        </Pressable>
+      </Modal>
     </LinearGradient>
   );
 }
@@ -141,6 +159,11 @@ function makeStyles(colors: ReturnType<typeof useTheme>['colors']) {
   return StyleSheet.create({
     root: { flex: 1 },
     scroll: { padding: 16, paddingTop: 52, gap: 14 },
+    titleRow: {
+      flexDirection: 'row',
+      alignItems: 'flex-start',
+      justifyContent: 'space-between',
+    },
     screenTitle: {
       color: colors.parchment,
       fontSize: 24,
@@ -153,6 +176,23 @@ function makeStyles(colors: ReturnType<typeof useTheme>['colors']) {
       fontSize: 12,
       fontStyle: 'italic',
       marginBottom: 4,
+    },
+    infoButton: {
+      width: 28,
+      height: 28,
+      borderRadius: 14,
+      borderWidth: 1.5,
+      borderColor: colors.trailGold,
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginTop: 4,
+    },
+    infoButtonText: {
+      color: colors.trailGold,
+      fontFamily: 'monospace',
+      fontSize: 13,
+      fontWeight: 'bold',
+      fontStyle: 'italic',
     },
     ringCard: {
       backgroundColor: colors.bgCard,
@@ -240,70 +280,6 @@ function makeStyles(colors: ReturnType<typeof useTheme>['colors']) {
       fontSize: 10,
       fontStyle: 'italic',
     },
-    hourlyCard: {
-      backgroundColor: colors.bgCard,
-      borderRadius: 10,
-      padding: 14,
-      gap: 10,
-      borderWidth: 1,
-      borderColor: colors.border,
-    },
-    hourlyBars: {
-      flexDirection: 'row',
-      height: 80,
-      gap: 4,
-      alignItems: 'flex-end',
-    },
-    hourBarCol: {
-      flex: 1,
-      alignItems: 'center',
-      height: '100%',
-      gap: 2,
-    },
-    hourBarTrack: {
-      flex: 1,
-      width: '100%',
-      backgroundColor: colors.bgCardLight,
-      borderRadius: 2,
-      justifyContent: 'flex-end',
-    },
-    hourBar: {
-      width: '100%',
-      borderRadius: 2,
-      minHeight: 4,
-    },
-    hourLabel: {
-      color: colors.dirtLight,
-      fontFamily: 'monospace',
-      fontSize: 7,
-    },
-    hourAxisLabel: {
-      color: colors.dirtLight,
-      fontFamily: 'monospace',
-      fontSize: 9,
-      textAlign: 'center',
-      opacity: 0.6,
-    },
-    conversionBox: {
-      backgroundColor: colors.bgCardLight,
-      borderRadius: 8,
-      padding: 12,
-      gap: 6,
-      borderWidth: 1,
-      borderColor: colors.border,
-    },
-    conversionTitle: {
-      color: colors.trailGold,
-      fontFamily: 'monospace',
-      fontSize: 12,
-      fontWeight: 'bold',
-    },
-    conversionText: {
-      color: colors.parchmentDark,
-      fontFamily: 'monospace',
-      fontSize: 11,
-      lineHeight: 17,
-    },
     connectButton: {
       backgroundColor: colors.bgCard,
       borderRadius: 10,
@@ -332,6 +308,92 @@ function makeStyles(colors: ReturnType<typeof useTheme>['colors']) {
       color: colors.trailGold,
       fontSize: 20,
       marginLeft: 'auto',
+    },
+    // Modal
+    modalOverlay: {
+      flex: 1,
+      backgroundColor: 'rgba(0,0,0,0.6)',
+      alignItems: 'center',
+      justifyContent: 'center',
+      padding: 32,
+    },
+    modalCard: {
+      backgroundColor: colors.inkBrown,
+      borderRadius: 14,
+      padding: 20,
+      width: '100%',
+      borderWidth: 1,
+      borderColor: colors.border,
+      gap: 12,
+    },
+    modalHeader: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 10,
+    },
+    modalInfoIcon: {
+      width: 24,
+      height: 24,
+      borderRadius: 12,
+      borderWidth: 1.5,
+      borderColor: colors.trailGold,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    modalInfoIconText: {
+      color: colors.trailGold,
+      fontFamily: 'monospace',
+      fontSize: 12,
+      fontWeight: 'bold',
+      fontStyle: 'italic',
+    },
+    modalTitle: {
+      color: colors.parchment,
+      fontFamily: 'monospace',
+      fontSize: 14,
+      fontWeight: 'bold',
+      flex: 1,
+    },
+    closeButton: {
+      padding: 4,
+    },
+    closeButtonText: {
+      color: colors.dirtLight,
+      fontSize: 16,
+    },
+    modalDivider: {
+      height: 1,
+      backgroundColor: colors.border,
+    },
+    modalRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 12,
+    },
+    modalEmoji: { fontSize: 20 },
+    modalText: {
+      color: colors.parchmentDark,
+      fontFamily: 'monospace',
+      fontSize: 12,
+      flex: 1,
+      lineHeight: 18,
+    },
+    modalHighlight: {
+      color: colors.trailGold,
+      fontWeight: 'bold',
+    },
+    modalDismiss: {
+      backgroundColor: colors.trailGold,
+      borderRadius: 8,
+      paddingVertical: 10,
+      alignItems: 'center',
+      marginTop: 4,
+    },
+    modalDismissText: {
+      color: colors.inkDark,
+      fontFamily: 'monospace',
+      fontSize: 13,
+      fontWeight: 'bold',
     },
   });
 }
