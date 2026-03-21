@@ -138,16 +138,6 @@ export default function HealthScreen() {
           ))}
         </View>
 
-        {/* Daily tip */}
-        <View style={styles.tipBox}>
-          <Text style={styles.tipText}>
-            💡 "Meet your step goal 5+ days this week to unlock the{' '}
-            <Text style={{ color: Colors.trailGold }}>Iron Settler</Text> badge and
-            boost party vitality by 15 points!"
-          </Text>
-        </View>
-
-        <View style={{ height: 24 }} />
       </ScrollView>
     </LinearGradient>
   );
