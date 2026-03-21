@@ -18,6 +18,7 @@ import StepRing from '../../components/StepRing';
 import WeekHeatmap from '../../components/WeekHeatmap';
 import { useRouter } from 'expo-router';
 
+
 export default function HomeScreen() {
   const router = useRouter();
   const { colors } = useTheme();
@@ -108,9 +109,11 @@ export default function HomeScreen() {
         <View style={s.statsRow}>
           <View style={s.stepsCard}>
             <Text style={s.cardTitle}>TODAY'S MARCH</Text>
-            <StepRing steps={state.todaySteps} />
+            <View style={{ alignItems: 'center' }}>
+              <StepRing steps={state.todaySteps} />
+            </View>
             <TouchableOpacity
-              style={s.logButton}
+              style={[s.logButton, { alignSelf: 'flex-end' }]}
               onPress={() => router.push('/steps')}
             >
               <Text style={s.logButtonText}>View Details →</Text>
@@ -173,7 +176,7 @@ function makeStyles(colors: ReturnType<typeof useTheme>['colors']) {
     },
     eyebrow: {
       color: colors.trailGold,
-      fontFamily: 'monospace',
+      // fontFamily: 'monospace',
       fontSize: 11,
       textTransform: 'uppercase',
       letterSpacing: 2,
@@ -184,7 +187,7 @@ function makeStyles(colors: ReturnType<typeof useTheme>['colors']) {
       fontSize: 26,
       fontWeight: 'bold',
       lineHeight: 30,
-      fontFamily: 'serif',
+      // fontFamily: 'serif',
     },
     headerRight: {
       alignItems: 'center',
@@ -194,10 +197,10 @@ function makeStyles(colors: ReturnType<typeof useTheme>['colors']) {
       borderWidth: 1,
       borderColor: colors.border,
     },
-    streakBadge: { fontSize: 24 },
+    streakBadge: { fontSize: 24, color: colors.parchment, },
     streakLabel: {
       color: colors.parchmentDark,
-      fontFamily: 'monospace',
+      // fontFamily: 'monospace',
       fontSize: 9,
       textTransform: 'uppercase',
     },
@@ -222,7 +225,7 @@ function makeStyles(colors: ReturnType<typeof useTheme>['colors']) {
     },
     locationLabel: {
       color: colors.dirtLight,
-      fontFamily: 'monospace',
+      // fontFamily: 'monospace',
       fontSize: 9,
       textTransform: 'uppercase',
       letterSpacing: 1,
@@ -230,7 +233,7 @@ function makeStyles(colors: ReturnType<typeof useTheme>['colors']) {
     },
     locationValue: {
       color: colors.parchment,
-      fontFamily: 'monospace',
+      // fontFamily: 'monospace',
       fontSize: 10,
       fontWeight: 'bold',
       textAlign: 'center',
@@ -253,27 +256,28 @@ function makeStyles(colors: ReturnType<typeof useTheme>['colors']) {
     statusIcon: { fontSize: 18, marginBottom: 2 },
     statusLabel: {
       color: colors.dirtLight,
-      fontFamily: 'monospace',
+      // fontFamily: 'monospace',
       fontSize: 9,
       textTransform: 'uppercase',
     },
     statusValue: {
       color: colors.parchment,
-      fontFamily: 'monospace',
+      // fontFamily: 'monospace',
       fontSize: 10,
       fontWeight: 'bold',
       marginTop: 2,
     },
     statsRow: { flexDirection: 'row', gap: 10 },
+
     stepsCard: {
       flex: 1,
       backgroundColor: colors.bgCard,
       borderRadius: 10,
       padding: 12,
-      alignItems: 'center',
       borderWidth: 1,
       borderColor: colors.border,
       gap: 8,
+      justifyContent: 'space-between',  // ← pushes button to bottom
     },
     healthCard: {
       flex: 1.4,
@@ -286,7 +290,7 @@ function makeStyles(colors: ReturnType<typeof useTheme>['colors']) {
     },
     cardTitle: {
       color: colors.trailGold,
-      fontFamily: 'monospace',
+      // fontFamily: 'monospace',
       fontSize: 9,
       textTransform: 'uppercase',
       letterSpacing: 2,
@@ -303,7 +307,7 @@ function makeStyles(colors: ReturnType<typeof useTheme>['colors']) {
     },
     logButtonText: {
       color: colors.trailGold,
-      fontFamily: 'monospace',
+      // fontFamily: 'monospace',
       fontSize: 10,
     },
     rewardsPreview: {
@@ -318,13 +322,13 @@ function makeStyles(colors: ReturnType<typeof useTheme>['colors']) {
     rewardsLeft: { flex: 1 },
     rewardsTitle: {
       color: colors.parchment,
-      fontFamily: 'monospace',
+      // fontFamily: 'monospace',
       fontSize: 14,
       fontWeight: 'bold',
     },
     rewardsSub: {
       color: colors.dirtLight,
-      fontFamily: 'monospace',
+      // fontFamily: 'monospace',
       fontSize: 10,
       marginTop: 3,
     },
@@ -342,7 +346,7 @@ function makeStyles(colors: ReturnType<typeof useTheme>['colors']) {
     tipIcon: { fontSize: 18 },
     tipText: {
       color: colors.parchmentDark,
-      fontFamily: 'monospace',
+      // fontFamily: 'monospace',
       fontSize: 11,
       flex: 1,
       lineHeight: 16,
