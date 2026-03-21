@@ -25,7 +25,9 @@
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
       "package": "com.oregontrailfitness",
-      "permissions": ["ACTIVITY_RECOGNITION"],
+      "permissions": [
+        "ACTIVITY_RECOGNITION"
+      ],
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false
     },
@@ -46,7 +48,8 @@
             "backgroundColor": "#0a0600"
           }
         }
-      ]
+      ],
+      "expo-font"
     ],
     "experiments": {
       "typedRoutes": true,
