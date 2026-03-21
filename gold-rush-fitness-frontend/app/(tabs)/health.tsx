@@ -47,31 +47,16 @@ export default function HealthScreen() {
         {/* Overall health */}
         <View style={s.overallCard}>
           <View style={s.overallLeft}>
-            <Text style={s.overallScore}>{state.healthScore}</Text>
-            <Text style={s.overallUnit}>/ 100</Text>
+            <Text style={s.overallTitle}>Overall Vitality</Text>
           </View>
           <View style={s.overallRight}>
-            <Text style={s.overallTitle}>Overall Vitality</Text>
-            <Text style={s.overallSub}>
-              Based on {daysHit}/7 goals met this week
-            </Text>
-            <View style={s.consistencyRow}>
-              <Text style={s.consistencyLabel}>Consistency</Text>
-              <View style={s.consistencyBar}>
-                <View
-                  style={[
-                    s.consistencyFill,
-                    { width: `${consistency}%`, backgroundColor: colors.healthFull },
-                  ]}
-                />
-              </View>
-              <Text style={s.consistencyPct}>{consistency}%</Text>
-            </View>
+            <Text style={s.overallScore}>{state.healthScore}</Text>
+            <Text style={s.overallUnit}>/ 100</Text>
           </View>
         </View>
 
         {/* All health bars */}
-        <View style={s.barsCard}>
+        {/* <View style={s.barsCard}>
           <Text style={s.cardTitle}>VITALS</Text>
           <HealthBar score={state.healthScore} label="Your Vitality" showDetails />
           <View style={s.divider} />
@@ -82,6 +67,31 @@ export default function HealthScreen() {
           <HealthBar score={Math.max(0, state.healthScore + 10)} label="Morale" showDetails />
           <View style={s.divider} />
           <HealthBar score={Math.max(0, state.healthScore - 5)} label="Food Supply" showDetails />
+        </View> */}
+
+        {/* Ailment risks */}
+        <View style={s.ailmentsCard}>
+          <Text style={s.cardTitle}>AILMENT RISK TRACKER</Text>
+          {AILMENTS.map((a, i) => (
+            <View key={i} style={s.ailmentRow}>
+              <Text style={s.ailmentEmoji}>{a.emoji}</Text>
+              <View style={s.ailmentInfo}>
+                <Text style={s.ailmentName}>{a.name}</Text>
+                <Text style={s.ailmentTip}>{a.tip}</Text>
+              </View>
+              <View style={[
+                s.riskBadge,
+                {
+                  backgroundColor: `${RISK_COLORS[a.risk]}22`,
+                  borderColor: RISK_COLORS[a.risk],
+                }
+              ]}>
+                <Text style={[s.riskText, { color: RISK_COLORS[a.risk] }]}>
+                  {a.risk}
+                </Text>
+              </View>
+            </View>
+          ))}
         </View>
 
         {/* How health is calculated */}
@@ -115,40 +125,6 @@ export default function HealthScreen() {
               <Text style={s.formulaValue}>+5 extra vitality</Text>
             </View>
           </View>
-        </View>
-
-        {/* Ailment risks */}
-        <View style={s.ailmentsCard}>
-          <Text style={s.cardTitle}>AILMENT RISK TRACKER</Text>
-          {AILMENTS.map((a, i) => (
-            <View key={i} style={s.ailmentRow}>
-              <Text style={s.ailmentEmoji}>{a.emoji}</Text>
-              <View style={s.ailmentInfo}>
-                <Text style={s.ailmentName}>{a.name}</Text>
-                <Text style={s.ailmentTip}>{a.tip}</Text>
-              </View>
-              <View style={[
-                s.riskBadge,
-                {
-                  backgroundColor: `${RISK_COLORS[a.risk]}22`,
-                  borderColor: RISK_COLORS[a.risk],
-                }
-              ]}>
-                <Text style={[s.riskText, { color: RISK_COLORS[a.risk] }]}>
-                  {a.risk}
-                </Text>
-              </View>
-            </View>
-          ))}
-        </View>
-
-        {/* Daily tip */}
-        <View style={s.tipBox}>
-          <Text style={s.tipText}>
-            💡 "Meet your step goal 5+ days this week to unlock the{' '}
-            <Text style={{ color: colors.trailGold }}>Iron Settler</Text> badge and
-            boost party vitality by 15 points!"
-          </Text>
         </View>
 
         <View style={{ height: 24 }} />
