@@ -52,37 +52,37 @@ export const DarkColors = {
 
 // ─── Light palette ──────────────────────────────────────────────────────────
 export const LightColors: typeof DarkColors = {
-  // UI surfaces
-  bgDeep: '#f5efe0',
-  bgCard: 'rgba(255, 248, 235, 0.95)',
-  bgCardLight: 'rgba(139, 94, 60, 0.07)',
-  border: 'rgba(180, 120, 20, 0.3)',
+  // UI surfaces — slightly warmer/richer base
+  bgDeep: '#f0e6cc',
+  bgCard: 'rgba(255, 252, 242, 0.97)',
+  bgCardLight: 'rgba(139, 94, 60, 0.09)',
+  border: 'rgba(140, 90, 10, 0.35)',
 
-  // Text
-  parchment: '#2c1a08',
-  parchmentDark: '#5c3d1e',
-  inkDark: '#1a0f00',
+  // Text — much darker for contrast
+  parchment: '#0f0700',          // near-black, was #2c1a08
+  parchmentDark: '#3a2008',      // deeper brown, was #5c3d1e
+  inkDark: '#000000',
   inkBrown: '#f0e6cc',
-  dirtLight: '#7a4f2c',
+  dirtLight: '#5a3010',          // darker for secondary text, was #7a4f2c
 
-  // Gradient stops
-  gradientTop: '#f5efe0',
-  gradientBottom: '#e8d5a8',
+  // Gradient stops — slightly richer
+  gradientTop: '#f0e6cc',
+  gradientBottom: '#dcc88a',     // more saturated gold, was #e8d5a8
 
-  // Accents
-  trailGold: '#b8860b',
-  sunOrange: '#c0621a',
-  sunGold: '#d4a017',
+  // Accents — richer, more saturated
+  trailGold: '#8a6000',          // deeper gold, was #b8860b
+  sunOrange: '#a04010',          // deeper orange-brown, was #c0621a
+  sunGold: '#b87800',            // was #d4a017
   dirt: '#8b5e3c',
   dirtDark: '#c4956a',
 
-  // Health
-  healthFull: '#3a8a3a',
-  healthGood: '#c87d20',
-  healthLow: '#b03030',
+  // Health — deeper/richer for better legibility on light bg
+  healthFull: '#1e6e1e',         // darker green, was #3a8a3a
+  healthGood: '#a05c00',         // darker amber, was #c87d20
+  healthLow: '#8a1a1a',          // darker red, was #b03030
   healthEmpty: '#d4b896',
 
-  // Scene (same sunset always)
+  // Scene
   skyDark: '#0d1b2a',
   skyMid: '#1b3a5c',
   skyHorizon: '#c17f3a',
