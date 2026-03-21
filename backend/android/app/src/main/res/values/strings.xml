@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Fitness Trail</string>
+    <string name="sync">Sync</string>
+    <string name="steps">Steps</string>
+    <string name="hydration">Hydration</string>
+    <string name="achievements">Achievements</string>
+    <string name="no_data">No data yet — tap Sync</string>
+    <string name="syncing">Syncing…</string>
+    <string name="of_goal">%d%% of goal</string>
+    <string name="steps_unit">steps</string>
+    <string name="hydration_unit">ml</string>
+    <string name="health_connect_permission_title">Health Permissions Required</string>
+    <string name="health_connect_permission_rationale">This app needs access to Health Connect to read your steps and hydration data.</string>
+    <string name="grant_permission">Grant Permission</string>
+    <string name="permission_denied">Permission denied. Please enable Health Connect permissions in settings.</string>
+</resources>
