@@ -1,347 +1,320 @@
 // components/WagonScene.tsx
-import React, { useEffect, useRef } from 'react';
-import { View, Animated, StyleSheet, Easing } from 'react-native';
-import Svg, {
-  Rect,
-  Circle,
-  Ellipse,
-  Path,
-  Line,
-  Polygon,
-  Defs,
-  LinearGradient,
-  Stop,
-  G,
-  Text as SvgText,
-} from 'react-native-svg';
-import { Colors } from '../constants/theme';
+import React from 'react';
+import { View, StyleSheet, Text } from 'react-native';
+import Svg, { Rect, G } from 'react-native-svg';
+import { useTheme } from '../context/ThemeContext';
 
 interface WagonSceneProps {
-  progressPercent: number; // 0–100
+  progressPercent: number;
   milesFromNext: number;
   nextMilestone: string;
 }
 
-export default function WagonScene({
-  progressPercent,
-  milesFromNext,
-  nextMilestone,
-}: WagonSceneProps) {
-  const wheelAnim = useRef(new Animated.Value(0)).current;
-  const dustAnim = useRef(new Animated.Value(0)).current;
-  const wagonBob = useRef(new Animated.Value(0)).current;
+// Helper to draw a pixel block at grid position
+// Each "pixel" is 4x4 real units on the SVG canvas
+const PX = 4;
 
-  useEffect(() => {
-    // Wheel spin
-    Animated.loop(
-      Animated.timing(wheelAnim, {
-        toValue: 1,
-        duration: 2000,
-        easing: Easing.linear,
-        useNativeDriver: true,
-      })
-    ).start();
+function Pixel({ x, y, color }: { x: number; y: number; color: string }) {
+  return <Rect x={x * PX} y={y * PX} width={PX} height={PX} fill={color} />;
+}
 
-    // Wagon bob
-    Animated.loop(
-      Animated.sequence([
-        Animated.timing(wagonBob, {
-          toValue: -2,
-          duration: 600,
-          easing: Easing.inOut(Easing.sin),
-          useNativeDriver: true,
-        }),
-        Animated.timing(wagonBob, {
-          toValue: 2,
-          duration: 600,
-          easing: Easing.inOut(Easing.sin),
-          useNativeDriver: true,
-        }),
-      ])
-    ).start();
+function PixelRow({ x, y, count, color }: { x: number; y: number; count: number; color: string }) {
+  return (
+    <>
+      {Array.from({ length: count }).map((_, i) => (
+        <Pixel key={i} x={x + i} y={y} color={color} />
+      ))}
+    </>
+  );
+}
 
-    // Dust puff
-    Animated.loop(
-      Animated.timing(dustAnim, {
-        toValue: 1,
-        duration: 1500,
-        easing: Easing.linear,
-        useNativeDriver: true,
-      })
-    ).start();
-  }, []);
+export default function WagonScene({ progressPercent, milesFromNext, nextMilestone }: WagonSceneProps) {
+  const { colors } = useTheme();
+  // Canvas: 95 pixels wide x 52 pixels tall (380 x 208 SVG units)
+  const W = 95;
+  const H = 52;
 
-  const wheelRotate = wheelAnim.interpolate({
-    inputRange: [0, 1],
-    outputRange: ['0deg', '360deg'],
-  });
-
-  const dustOpacity = dustAnim.interpolate({
-    inputRange: [0, 0.5, 1],
-    outputRange: [0.6, 0.2, 0],
-  });
-
-  const dustTranslateX = dustAnim.interpolate({
-    inputRange: [0, 1],
-    outputRange: [0, -30],
-  });
+  // Color palette — classic Oregon Trail CRT colors
+  const C = {
+    black:      '#000000',
+    skyBlue:    '#2468b0',
+    skyLight:   '#5ab4e8',
+    grassGreen: '#2e8b1a',
+    grassDark:  '#1a5e0a',
+    dirtBrown:  '#7a4f2c',
+    dirtDark:   '#4a2e10',
+    white:      '#ffffff',
+    offWhite:   '#e8e8e8',
+    gray:       '#888888',
+    darkGray:   '#444444',
+    wagonCream: '#e8d8a0',
+    woodBrown:  '#8b5a2b',
+    wheelDark:  '#3d2010',
+    oxWhite:    '#f0f0f0',
+    oxGray:     '#c0c0c0',
+    gold:       '#d4a017',
+    cloudWhite: '#ffffff',
+    sunYellow:  '#f5c842',
+    treeTrunk:  '#5c3010',
+    treeGreen:  '#1a6e0a',
+  };
 
   return (
-    <View style={styles.container}>
-      <Svg width="100%" height="220" viewBox="0 0 380 220">
-        <Defs>
-          {/* Sky gradient */}
-          <LinearGradient id="skyGrad" x1="0" y1="0" x2="0" y2="1">
-            <Stop offset="0%" stopColor="#0d1b2a" />
-            <Stop offset="60%" stopColor="#1b3a5c" />
-            <Stop offset="100%" stopColor="#c17f3a" />
-          </LinearGradient>
-          {/* Ground gradient */}
-          <LinearGradient id="groundGrad" x1="0" y1="0" x2="0" y2="1">
-            <Stop offset="0%" stopColor="#8b5e3c" />
-            <Stop offset="100%" stopColor="#5c3d1e" />
-          </LinearGradient>
-          {/* Sun glow */}
-          <LinearGradient id="sunGlow" x1="0" y1="0" x2="0" y2="1">
-            <Stop offset="0%" stopColor="#f5c842" stopOpacity="1" />
-            <Stop offset="100%" stopColor="#e8873a" stopOpacity="0.6" />
-          </LinearGradient>
-          {/* Canvas cover */}
-          <LinearGradient id="canvasGrad" x1="0" y1="0" x2="0" y2="1">
-            <Stop offset="0%" stopColor="#e8d5a8" />
-            <Stop offset="100%" stopColor="#c4a96a" />
-          </LinearGradient>
-          {/* Wagon wood */}
-          <LinearGradient id="woodGrad" x1="0" y1="0" x2="0" y2="1">
-            <Stop offset="0%" stopColor="#7a4f2c" />
-            <Stop offset="100%" stopColor="#5c3520" />
-          </LinearGradient>
-        </Defs>
+    <View style={[styles.container, { backgroundColor: colors.inkBrown }]}>
+      <Svg
+        width="100%"
+        height="100%"
+        viewBox={`0 0 ${W * PX} ${H * PX}`}
+        preserveAspectRatio="xMidYMid meet"
+      >
+        {/* ── SKY ── */}
+        <Rect x={0} y={0} width={W * PX} height={26 * PX} fill={C.skyBlue} />
 
-        {/* Sky */}
-        <Rect x="0" y="0" width="380" height="160" fill="url(#skyGrad)" />
+        {/* Sky gradient top strip (lighter) */}
+        <Rect x={0} y={0} width={W * PX} height={6 * PX} fill={C.skyLight} />
 
-        {/* Sun */}
-        <Circle cx="310" cy="55" r="28" fill="url(#sunGlow)" opacity="0.9" />
-        <Circle cx="310" cy="55" r="20" fill="#f5c842" />
+        {/* ── SUN (top right) ── */}
+        <G>
+          <PixelRow x={78} y={3} count={4} color={C.sunYellow} />
+          <PixelRow x={77} y={4} count={6} color={C.sunYellow} />
+          <PixelRow x={77} y={5} count={6} color={C.sunYellow} />
+          <PixelRow x={77} y={6} count={6} color={C.sunYellow} />
+          <PixelRow x={78} y={7} count={4} color={C.sunYellow} />
+        </G>
 
-        {/* Stars (small dots) */}
-        {[
-          [30, 20], [70, 10], [120, 30], [160, 15], [200, 25],
-          [250, 8], [20, 50], [100, 45], [180, 40], [230, 35],
-        ].map(([x, y], i) => (
-          <Circle key={i} cx={x} cy={y} r="1.5" fill="white" opacity="0.6" />
-        ))}
+        {/* ── CLOUD 1 ── */}
+        <G>
+          <PixelRow x={10} y={7} count={5} color={C.cloudWhite} />
+          <PixelRow x={8}  y={8} count={9} color={C.cloudWhite} />
+          <PixelRow x={8}  y={9} count={9} color={C.cloudWhite} />
+          <PixelRow x={10} y={10} count={5} color={C.cloudWhite} />
+        </G>
 
-        {/* Distant mountains */}
-        <Path
-          d="M0 120 L40 80 L80 100 L130 60 L180 95 L220 75 L270 90 L310 65 L350 85 L380 70 L380 130 L0 130Z"
-          fill="#2a4a3a"
-          opacity="0.7"
-        />
-        <Path
-          d="M0 130 L60 100 L110 115 L160 90 L210 108 L260 95 L310 110 L360 100 L380 105 L380 140 L0 140Z"
-          fill="#1e3828"
-          opacity="0.5"
-        />
+        {/* ── CLOUD 2 ── */}
+        <G>
+          <PixelRow x={48} y={5} count={6} color={C.cloudWhite} />
+          <PixelRow x={46} y={6} count={10} color={C.cloudWhite} />
+          <PixelRow x={46} y={7} count={10} color={C.cloudWhite} />
+          <PixelRow x={48} y={8} count={6} color={C.cloudWhite} />
+        </G>
 
-        {/* Prairie / ground */}
-        <Rect x="0" y="148" width="380" height="72" fill="url(#groundGrad)" />
+        {/* ── DISTANT MOUNTAINS ── */}
+        <G>
+          {/* Mountain 1 */}
+          <PixelRow x={60} y={16} count={2} color={C.darkGray} />
+          <PixelRow x={58} y={17} count={6} color={C.darkGray} />
+          <PixelRow x={56} y={18} count={10} color={C.darkGray} />
+          <PixelRow x={55} y={19} count={12} color={C.darkGray} />
+          {/* Mountain 2 */}
+          <PixelRow x={72} y={15} count={2} color={C.gray} />
+          <PixelRow x={70} y={16} count={6} color={C.gray} />
+          <PixelRow x={68} y={17} count={10} color={C.gray} />
+          <PixelRow x={67} y={18} count={12} color={C.gray} />
+          <PixelRow x={66} y={19} count={14} color={C.gray} />
+        </G>
 
-        {/* Trail path (ruts) */}
-        <Path
-          d="M0 162 Q190 158 380 165"
-          stroke="#5c3d1e"
-          strokeWidth="2"
-          fill="none"
-          opacity="0.5"
-        />
-        <Path
-          d="M0 172 Q190 168 380 175"
-          stroke="#5c3d1e"
-          strokeWidth="2"
-          fill="none"
-          opacity="0.5"
-        />
+        {/* ── GROUND / GRASS ── */}
+        <Rect x={0} y={26 * PX} width={W * PX} height={14 * PX} fill={C.grassGreen} />
 
-        {/* Prairie grass tufts */}
-        {[20, 60, 100, 250, 290, 340].map((x, i) => (
-          <G key={i}>
-            <Line x1={x} y1="158" x2={x - 5} y2="148" stroke="#4a6329" strokeWidth="2" />
-            <Line x1={x} y1="158" x2={x} y2="146" stroke="#5a7335" strokeWidth="2" />
-            <Line x1={x} y1="158" x2={x + 5} y2="149" stroke="#4a6329" strokeWidth="2" />
-          </G>
-        ))}
+        {/* Ground detail rows */}
+        <PixelRow x={0}  y={26} count={95} color={C.grassDark} />
+        <PixelRow x={0}  y={27} count={95} color={C.grassGreen} />
 
-        {/* Distant destination flag */}
-        <Line x1="345" y1="100" x2="345" y2="130" stroke="#c9b99a" strokeWidth="2" />
-        <Polygon points="345,100 365,108 345,116" fill="#d4a017" />
+        {/* ── DIRT TRAIL (two ruts) ── */}
+        <Rect x={0} y={32 * PX} width={W * PX} height={6 * PX} fill={C.dirtBrown} />
+        <PixelRow x={0} y={32} count={95} color={C.dirtDark} />
+        {/* Rut lines */}
+        <PixelRow x={0} y={34} count={95} color={C.dirtDark} />
+        <PixelRow x={0} y={36} count={95} color={C.dirtDark} />
+        <PixelRow x={0} y={37} count={95} color={C.dirtDark} />
 
-        {/* Progress track on ground */}
-        <Rect x="10" y="195" width="360" height="6" rx="3" fill="#3d2010" />
+        {/* ── GRASS FOREGROUND ── */}
+        <Rect x={0} y={38 * PX} width={W * PX} height={8 * PX} fill={C.grassGreen} />
+        <PixelRow x={0} y={38} count={95} color={C.grassDark} />
+
+        {/* Grass tufts */}
+        <Pixel x={5}  y={39} color={C.grassDark} />
+        <Pixel x={6}  y={38} color={C.grassDark} />
+        <Pixel x={20} y={39} color={C.grassDark} />
+        <Pixel x={21} y={38} color={C.grassDark} />
+        <Pixel x={40} y={39} color={C.grassDark} />
+        <Pixel x={41} y={38} color={C.grassDark} />
+        <Pixel x={65} y={39} color={C.grassDark} />
+        <Pixel x={66} y={38} color={C.grassDark} />
+        <Pixel x={80} y={39} color={C.grassDark} />
+        <Pixel x={81} y={38} color={C.grassDark} />
+
+        {/* ── TREE (right side) ── */}
+        <G>
+          {/* Trunk */}
+          <PixelRow x={85} y={24} count={2} color={C.treeTrunk} />
+          <PixelRow x={85} y={25} count={2} color={C.treeTrunk} />
+          <PixelRow x={85} y={26} count={2} color={C.treeTrunk} />
+          {/* Foliage */}
+          <PixelRow x={83} y={20} count={6} color={C.treeGreen} />
+          <PixelRow x={82} y={21} count={8} color={C.treeGreen} />
+          <PixelRow x={82} y={22} count={8} color={C.treeGreen} />
+          <PixelRow x={83} y={23} count={6} color={C.treeGreen} />
+          <PixelRow x={84} y={24} count={4} color={C.treeGreen} />
+        </G>
+
+        {/* ── OXEN (left pair) ── */}
+        <G>
+          {/* Ox body */}
+          <PixelRow x={8}  y={28} count={8} color={C.oxWhite} />
+          <PixelRow x={7}  y={29} count={10} color={C.oxWhite} />
+          <PixelRow x={7}  y={30} count={10} color={C.oxWhite} />
+          <PixelRow x={8}  y={31} count={8} color={C.oxWhite} />
+          {/* Head */}
+          <PixelRow x={5}  y={28} count={4} color={C.oxWhite} />
+          <PixelRow x={5}  y={29} count={4} color={C.oxWhite} />
+          {/* Horns */}
+          <Pixel x={5}  y={27} color={C.oxGray} />
+          <Pixel x={7}  y={26} color={C.oxGray} />
+          {/* Eye */}
+          <Pixel x={5}  y={28} color={C.black} />
+          {/* Legs */}
+          <Pixel x={9}  y={32} color={C.oxGray} />
+          <Pixel x={9}  y={33} color={C.oxGray} />
+          <Pixel x={11} y={32} color={C.oxGray} />
+          <Pixel x={11} y={33} color={C.oxGray} />
+          <Pixel x={13} y={32} color={C.oxGray} />
+          <Pixel x={13} y={33} color={C.oxGray} />
+          <Pixel x={15} y={32} color={C.oxGray} />
+          <Pixel x={15} y={33} color={C.oxGray} />
+        </G>
+
+        {/* ── YOKE / TONGUE ── */}
+        <PixelRow x={17} y={30} count={6} color={C.woodBrown} />
+
+        {/* ── WAGON BOX ── */}
+        <G>
+          {/* Main box */}
+          <PixelRow x={23} y={27} count={18} color={C.woodBrown} />
+          <PixelRow x={23} y={28} count={18} color={C.woodBrown} />
+          <PixelRow x={23} y={29} count={18} color={C.woodBrown} />
+          <PixelRow x={23} y={30} count={18} color={C.woodBrown} />
+          <PixelRow x={23} y={31} count={18} color={C.woodBrown} />
+          {/* Plank lines */}
+          <Pixel x={27} y={27} color={C.dirtDark} />
+          <Pixel x={27} y={28} color={C.dirtDark} />
+          <Pixel x={27} y={29} color={C.dirtDark} />
+          <Pixel x={27} y={30} color={C.dirtDark} />
+          <Pixel x={31} y={27} color={C.dirtDark} />
+          <Pixel x={31} y={28} color={C.dirtDark} />
+          <Pixel x={31} y={29} color={C.dirtDark} />
+          <Pixel x={31} y={30} color={C.dirtDark} />
+          <Pixel x={35} y={27} color={C.dirtDark} />
+          <Pixel x={35} y={28} color={C.dirtDark} />
+          <Pixel x={35} y={29} color={C.dirtDark} />
+          <Pixel x={35} y={30} color={C.dirtDark} />
+          {/* Top rail */}
+          <PixelRow x={23} y={26} count={18} color={C.dirtDark} />
+          {/* Bottom rail */}
+          <PixelRow x={23} y={32} count={18} color={C.dirtDark} />
+        </G>
+
+        {/* ── CANVAS COVER ── */}
+        <G>
+          <PixelRow x={24} y={22} count={16} color={C.wagonCream} />
+          <PixelRow x={23} y={23} count={18} color={C.wagonCream} />
+          <PixelRow x={23} y={24} count={18} color={C.wagonCream} />
+          <PixelRow x={23} y={25} count={18} color={C.wagonCream} />
+          <PixelRow x={24} y={21} count={14} color={C.wagonCream} />
+          <PixelRow x={26} y={20} count={10} color={C.wagonCream} />
+          <PixelRow x={28} y={19} count={6} color={C.wagonCream} />
+          {/* Canvas ribs (darker lines) */}
+          <Pixel x={26} y={20} color={C.offWhite} />
+          <Pixel x={26} y={21} color={C.offWhite} />
+          <Pixel x={31} y={19} color={C.offWhite} />
+          <Pixel x={31} y={20} color={C.offWhite} />
+          <Pixel x={31} y={21} color={C.offWhite} />
+          <Pixel x={36} y={20} color={C.offWhite} />
+          <Pixel x={36} y={21} color={C.offWhite} />
+        </G>
+
+        {/* ── FRONT WHEEL ── */}
+        <G>
+          {/* Outer ring */}
+          <PixelRow x={24} y={32} count={4} color={C.wheelDark} />
+          <PixelRow x={23} y={33} count={6} color={C.wheelDark} />
+          <PixelRow x={23} y={34} count={6} color={C.wheelDark} />
+          <PixelRow x={23} y={35} count={6} color={C.wheelDark} />
+          <PixelRow x={24} y={36} count={4} color={C.wheelDark} />
+          {/* Hub */}
+          <Pixel x={25} y={34} color={C.dirtBrown} />
+          <Pixel x={26} y={34} color={C.dirtBrown} />
+          {/* Spokes */}
+          <Pixel x={26} y={33} color={C.woodBrown} />
+          <Pixel x={26} y={35} color={C.woodBrown} />
+          <Pixel x={24} y={34} color={C.woodBrown} />
+          <Pixel x={28} y={34} color={C.woodBrown} />
+        </G>
+
+        {/* ── REAR WHEEL (bigger) ── */}
+        <G>
+          {/* Outer ring */}
+          <PixelRow x={35} y={31} count={6} color={C.wheelDark} />
+          <PixelRow x={33} y={32} count={10} color={C.wheelDark} />
+          <PixelRow x={33} y={33} count={10} color={C.wheelDark} />
+          <PixelRow x={33} y={34} count={10} color={C.wheelDark} />
+          <PixelRow x={33} y={35} count={10} color={C.wheelDark} />
+          <PixelRow x={33} y={36} count={10} color={C.wheelDark} />
+          <PixelRow x={35} y={37} count={6} color={C.wheelDark} />
+          {/* Hub */}
+          <PixelRow x={36} y={34} count={4} color={C.dirtBrown} />
+          {/* Spokes */}
+          <Pixel x={38} y={32} color={C.woodBrown} />
+          <Pixel x={38} y={33} color={C.woodBrown} />
+          <Pixel x={38} y={35} color={C.woodBrown} />
+          <Pixel x={38} y={36} color={C.woodBrown} />
+          <Pixel x={34} y={34} color={C.woodBrown} />
+          <Pixel x={35} y={34} color={C.woodBrown} />
+          <Pixel x={40} y={34} color={C.woodBrown} />
+          <Pixel x={41} y={34} color={C.woodBrown} />
+        </G>
+
+        {/* ── DESTINATION FLAG (right) ── */}
+        <G>
+          {/* Pole */}
+          <Pixel x={91} y={22} color={C.offWhite} />
+          <Pixel x={91} y={23} color={C.offWhite} />
+          <Pixel x={91} y={24} color={C.offWhite} />
+          <Pixel x={91} y={25} color={C.offWhite} />
+          <Pixel x={91} y={26} color={C.offWhite} />
+          {/* Flag */}
+          <PixelRow x={92} y={22} count={3} color={C.gold} />
+          <PixelRow x={92} y={23} count={3} color={C.gold} />
+          <PixelRow x={92} y={24} count={2} color={C.gold} />
+        </G>
+
+        {/* ── PROGRESS BAR (bottom strip) ── */}
+        <Rect x={0} y={46 * PX} width={W * PX} height={6 * PX} fill={C.black} />
+        {/* Track */}
+        <Rect x={4 * PX} y={48 * PX} width={87 * PX} height={2 * PX} fill={C.darkGray} />
+        {/* Fill */}
         <Rect
-          x="10"
-          y="195"
-          width={Math.max(8, (progressPercent / 100) * 360)}
-          height="6"
-          rx="3"
-          fill="#d4a017"
+          x={4 * PX}
+          y={48 * PX}
+          width={Math.max(2, (progressPercent / 100) * 87) * PX}
+          height={2 * PX}
+          fill={C.gold}
+        />
+        {/* Wagon marker on progress bar */}
+        <Pixel
+          x={Math.round(4 + (progressPercent / 100) * 87)}
+          y={47}
+          color={C.white}
         />
 
-        {/* Milestone label */}
-        <SvgText
-          x="370"
-          y="203"
-          fontSize="8"
-          fill="#c9b99a"
-          textAnchor="end"
-          fontFamily="monospace"
-        >
-          {nextMilestone}
-        </SvgText>
-        <SvgText
-          x="10"
-          y="215"
-          fontSize="7"
-          fill="#8b6a4a"
-          fontFamily="monospace"
-        >
-          {milesFromNext} mi to next stop
-        </SvgText>
       </Svg>
 
-      {/* Animated wagon layer (over SVG) */}
-      <Animated.View
-        style={[
-          styles.wagonContainer,
-          { transform: [{ translateY: wagonBob }] },
-        ]}
-      >
-        {/* Dust cloud */}
-        <Animated.View
-          style={[
-            styles.dustCloud,
-            {
-              opacity: dustOpacity,
-              transform: [{ translateX: dustTranslateX }],
-            },
-          ]}
-        >
-          <Svg width="60" height="30" viewBox="0 0 60 30">
-            <Ellipse cx="20" cy="20" rx="18" ry="10" fill="#c4956a" opacity="0.4" />
-            <Ellipse cx="35" cy="18" rx="14" ry="8" fill="#c4956a" opacity="0.3" />
-            <Ellipse cx="12" cy="22" rx="10" ry="6" fill="#c4956a" opacity="0.2" />
-          </Svg>
-        </Animated.View>
-
-        {/* Wagon SVG */}
-        <Svg width="160" height="90" viewBox="0 0 160 90">
-          {/* Oxen (left) */}
-          <G>
-            {/* Body */}
-            <Ellipse cx="25" cy="68" rx="22" ry="11" fill="#6b4423" />
-            {/* Head */}
-            <Ellipse cx="5" cy="62" rx="9" ry="7" fill="#7a4f2c" />
-            {/* Horn */}
-            <Line x1="2" y1="57" x2="-3" y2="52" stroke="#5c3d1e" strokeWidth="2" />
-            <Line x1="8" y1="56" x2="10" y2="50" stroke="#5c3d1e" strokeWidth="2" />
-            {/* Eye */}
-            <Circle cx="3" cy="61" r="1.5" fill="#1a0f00" />
-            {/* Legs */}
-            <Line x1="18" y1="76" x2="16" y2="88" stroke="#5c3d1e" strokeWidth="3" strokeLinecap="round" />
-            <Line x1="26" y1="77" x2="24" y2="88" stroke="#5c3d1e" strokeWidth="3" strokeLinecap="round" />
-            <Line x1="34" y1="77" x2="34" y2="88" stroke="#5c3d1e" strokeWidth="3" strokeLinecap="round" />
-            <Line x1="42" y1="76" x2="44" y2="88" stroke="#5c3d1e" strokeWidth="3" strokeLinecap="round" />
-            {/* Yoke */}
-            <Rect x="44" y="61" width="8" height="4" rx="2" fill="#4a2e10" />
-          </G>
-
-          {/* Tongue / pole */}
-          <Line x1="52" y1="64" x2="78" y2="70" stroke="#4a2e10" strokeWidth="4" strokeLinecap="round" />
-
-          {/* Wagon box */}
-          <Rect x="78" y="60" width="72" height="24" rx="2" fill="url(#woodGrad2)" />
-          {/* Wagon box planks */}
-          {[84, 92, 100, 108, 116, 124, 132, 140].map((x, i) => (
-            <Line key={i} x1={x} y1="60" x2={x} y2="84" stroke="#4a2010" strokeWidth="0.8" opacity="0.5" />
-          ))}
-          {/* Top rail */}
-          <Rect x="76" y="57" width="76" height="5" rx="2" fill="#8b5020" />
-          {/* Bottom board */}
-          <Rect x="76" y="82" width="76" height="5" rx="2" fill="#6b3e18" />
-
-          {/* Canvas cover */}
-          <Path
-            d="M82 58 Q118 30 150 58"
-            stroke="#c4a96a"
-            strokeWidth="14"
-            fill="none"
-            strokeLinecap="round"
-          />
-          <Path
-            d="M82 58 Q118 32 150 58"
-            stroke="#e8d5a8"
-            strokeWidth="10"
-            fill="none"
-            strokeLinecap="round"
-          />
-          {/* Canvas ribs */}
-          {[95, 110, 124, 138].map((x, i) => (
-            <Path
-              key={i}
-              d={`M${x - 8} 58 Q${x} ${38 + Math.abs(x - 116) * 0.3} ${x + 8} 58`}
-              stroke="#c4a96a"
-              strokeWidth="1.5"
-              fill="none"
-              opacity="0.6"
-            />
-          ))}
-
-          {/* Front wheel */}
-          <Animated.View style={{ transform: [{ rotate: wheelRotate }] }}>
-            <Svg width="30" height="30" style={{ position: 'absolute', left: 74, top: 62 }}>
-              <Circle cx="15" cy="15" r="13" stroke="#3d2010" strokeWidth="3" fill="none" />
-              <Circle cx="15" cy="15" r="4" fill="#3d2010" />
-              {[0, 45, 90, 135].map((angle, i) => {
-                const rad = (angle * Math.PI) / 180;
-                return (
-                  <Line
-                    key={i}
-                    x1={15 + Math.cos(rad) * 4}
-                    y1={15 + Math.sin(rad) * 4}
-                    x2={15 + Math.cos(rad) * 12}
-                    y2={15 + Math.sin(rad) * 12}
-                    stroke="#5c3520"
-                    strokeWidth="2"
-                  />
-                );
-              })}
-            </Svg>
-          </Animated.View>
-
-          {/* Rear wheel */}
-          <Animated.View style={{ transform: [{ rotate: wheelRotate }] }}>
-            <Svg width="36" height="36" style={{ position: 'absolute', left: 126, top: 58 }}>
-              <Circle cx="18" cy="18" r="16" stroke="#3d2010" strokeWidth="4" fill="none" />
-              <Circle cx="18" cy="18" r="5" fill="#3d2010" />
-              {[0, 36, 72, 108, 144].map((angle, i) => {
-                const rad = (angle * Math.PI) / 180;
-                return (
-                  <Line
-                    key={i}
-                    x1={18 + Math.cos(rad) * 5}
-                    y1={18 + Math.sin(rad) * 5}
-                    x2={18 + Math.cos(rad) * 14}
-                    y2={18 + Math.sin(rad) * 14}
-                    stroke="#5c3520"
-                    strokeWidth="2.5"
-                  />
-                );
-              })}
-            </Svg>
-          </Animated.View>
-        </Svg>
-      </Animated.View>
+      {/* Miles label below scene */}
+      <View style={[styles.infoRow, { backgroundColor: colors.inkBrown }]}>
+        <Text style={[styles.infoText, { color: colors.trailGold }]}>
+          {milesFromNext} mi to {nextMilestone.split(',')[0]}
+        </Text>
+      </View>
     </View>
   );
 }
@@ -349,20 +322,18 @@ export default function WagonScene({
 const styles = StyleSheet.create({
   container: {
     width: '100%',
-    height: 220,
-    position: 'relative',
-    overflow: 'hidden',
+    aspectRatio: 95 / 52,
   },
-  wagonContainer: {
-    position: 'absolute',
-    bottom: 30,
-    left: 60,
+  infoRow: {
+    paddingHorizontal: 8,
+    paddingVertical: 4,
     flexDirection: 'row',
-    alignItems: 'flex-end',
+    justifyContent: 'flex-end',
   },
-  dustCloud: {
-    position: 'absolute',
-    bottom: 8,
-    left: -40,
+  infoText: {
+    fontFamily: 'monospace',
+    fontSize: 9,
+    textTransform: 'uppercase',
+    letterSpacing: 1,
   },
 });
