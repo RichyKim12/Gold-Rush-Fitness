@@ -37,26 +37,11 @@ function getSkyPeriod(hour?: number): SkyPeriod {
   return 'night';
 }
 
-// Sky color palettes per period
 const SKY_PALETTES: Record<SkyPeriod, { skyMain: string; skyTop: string; horizonGlow?: string }> = {
-  day: {
-    skyMain: '#2468b0',
-    skyTop:  '#5ab4e8',
-  },
-  sunrise: {
-    skyMain:     '#e87d3e',
-    skyTop:      '#f5c162',
-    horizonGlow: '#f59642',
-  },
-  sunset: {
-    skyMain:     '#c0402a',
-    skyTop:      '#e8722e',
-    horizonGlow: '#f0a030',
-  },
-  night: {
-    skyMain: '#0a0e2a',
-    skyTop:  '#141830',
-  },
+  day:     { skyMain: '#2468b0', skyTop: '#5ab4e8' },
+  sunrise: { skyMain: '#e87d3e', skyTop: '#f5c162', horizonGlow: '#f59642' },
+  sunset:  { skyMain: '#c0402a', skyTop: '#e8722e', horizonGlow: '#f0a030' },
+  night:   { skyMain: '#0a0e2a', skyTop: '#141830' },
 };
 
 export default function WagonScene({ progressPercent, milesFromNext, nextMilestone }: WagonSceneProps) {
@@ -64,7 +49,6 @@ export default function WagonScene({ progressPercent, milesFromNext, nextMilesto
   const W = 95;
   const H = 52;
 
-  // ── DEV: time-of-day tester ──────────────────────────────────────────────
   const [testHour, setTestHour] = useState<number>(new Date().getHours());
   const PERIOD_LABELS: Record<SkyPeriod, string> = {
     sunrise: '🌅 Sunrise',
@@ -72,7 +56,6 @@ export default function WagonScene({ progressPercent, milesFromNext, nextMilesto
     sunset:  '🌇 Sunset',
     night:   '🌙 Night',
   };
-  // ─────────────────────────────────────────────────────────────────────────
 
   const period = getSkyPeriod(testHour);
   const sky = SKY_PALETTES[period];
@@ -104,12 +87,10 @@ export default function WagonScene({ progressPercent, milesFromNext, nextMilesto
     treeGreen:  period === 'night' ? '#0e3d06' : '#1a6e0a',
   };
 
-  // Grass/ground tones shift at night
-  const grassMain  = period === 'night' ? '#1a4e0e' : C.grassGreen;
-  const grassEdge  = period === 'night' ? '#0e3008' : C.grassDark;
-  // Mountain tones shift at sunset/night
-  const mtn1Color  = period === 'night' ? '#111828' : (period === 'sunset' ? '#6b3020' : C.darkGray);
-  const mtn2Color  = period === 'night' ? '#1a2038' : (period === 'sunset' ? '#8a4030' : C.gray);
+  const grassMain = period === 'night' ? '#1a4e0e' : C.grassGreen;
+  const grassEdge = period === 'night' ? '#0e3008' : C.grassDark;
+  const mtn1Color = period === 'night' ? '#111828' : (period === 'sunset' ? '#6b3020' : C.darkGray);
+  const mtn2Color = period === 'night' ? '#1a2038' : (period === 'sunset' ? '#8a4030' : C.gray);
 
   return (
     <View style={[styles.container, { backgroundColor: colors.inkBrown }]}>
@@ -131,322 +112,323 @@ export default function WagonScene({ progressPercent, milesFromNext, nextMilesto
           thumbTintColor={colors.trailGold}
         />
       </View> */}
+
       <View style={styles.svgWrap}>
         <Svg
-        width="100%"
-        height="100%"
-        viewBox={`0 0 ${W * PX} ${H * PX}`}
-        preserveAspectRatio="xMidYMid meet"
-      >
-        {/* ── SKY ── */}
-        <Rect x={0} y={0} width={W * PX} height={26 * PX} fill={C.skyBlue} />
-        <Rect x={0} y={0} width={W * PX} height={6 * PX} fill={C.skyLight} />
+          width="100%"
+          height="100%"
+          viewBox={`0 0 ${W * PX} ${H * PX}`}
+          preserveAspectRatio="xMidYMid meet"
+        >
+          {/* ── SKY ── */}
+          <Rect x={0} y={0} width={W * PX} height={26 * PX} fill={C.skyBlue} />
+          <Rect x={0} y={0} width={W * PX} height={6 * PX} fill={C.skyLight} />
 
-        {/* Horizon glow band for sunrise/sunset */}
-        {sky.horizonGlow && (
-          <Rect x={0} y={20 * PX} width={W * PX} height={6 * PX} fill={sky.horizonGlow} />
-        )}
+          {sky.horizonGlow && (
+            <Rect x={0} y={20 * PX} width={W * PX} height={6 * PX} fill={sky.horizonGlow} />
+          )}
 
-        {/* ── NIGHT: STARS ── */}
-        {period === 'night' && (
+          {/* ── NIGHT: STARS ── */}
+          {period === 'night' && (
+            <G>
+              <Pixel x={3}  y={2}  color={C.starWhite} />
+              <Pixel x={9}  y={4}  color={C.starWhite} />
+              <Pixel x={15} y={1}  color={C.starWhite} />
+              <Pixel x={22} y={3}  color={C.starWhite} />
+              <Pixel x={30} y={5}  color={C.starWhite} />
+              <Pixel x={37} y={2}  color={C.starWhite} />
+              <Pixel x={44} y={4}  color={C.starWhite} />
+              <Pixel x={52} y={1}  color={C.starWhite} />
+              <Pixel x={58} y={3}  color={C.starWhite} />
+              <Pixel x={65} y={5}  color={C.starWhite} />
+              <Pixel x={71} y={2}  color={C.starWhite} />
+              <Pixel x={6}  y={8}  color={C.starWhite} />
+              <Pixel x={18} y={10} color={C.starWhite} />
+              <Pixel x={26} y={7}  color={C.starWhite} />
+              <Pixel x={35} y={11} color={C.starWhite} />
+              <Pixel x={48} y={9}  color={C.starWhite} />
+              <Pixel x={60} y={8}  color={C.starWhite} />
+              <Pixel x={68} y={11} color={C.starWhite} />
+              <Pixel x={75} y={7}  color={C.starWhite} />
+              <PixelRow x={12} y={6}  count={2} color={C.starWhite} />
+              <PixelRow x={42} y={8}  count={2} color={C.starWhite} />
+              <PixelRow x={63} y={6}  count={2} color={C.starWhite} />
+            </G>
+          )}
+
+          {/* ── NIGHT: MOON ── */}
+          {period === 'night' && (
+            <G>
+              <PixelRow x={77} y={3} count={4} color={C.moonWhite} />
+              <PixelRow x={76} y={4} count={6} color={C.moonWhite} />
+              <PixelRow x={76} y={5} count={6} color={C.moonWhite} />
+              <PixelRow x={76} y={6} count={6} color={C.moonWhite} />
+              <PixelRow x={77} y={7} count={4} color={C.moonWhite} />
+              <PixelRow x={79} y={3} count={2} color={C.skyBlue} />
+              <PixelRow x={80} y={4} count={2} color={C.skyBlue} />
+              <PixelRow x={80} y={5} count={2} color={C.skyBlue} />
+              <PixelRow x={80} y={6} count={2} color={C.skyBlue} />
+              <PixelRow x={79} y={7} count={2} color={C.skyBlue} />
+            </G>
+          )}
+
+          {/* ── DAY: SUN ── */}
+          {period === 'day' && (
+            <G>
+              <PixelRow x={78} y={3} count={4} color={C.sunYellow} />
+              <PixelRow x={77} y={4} count={6} color={C.sunYellow} />
+              <PixelRow x={77} y={5} count={6} color={C.sunYellow} />
+              <PixelRow x={77} y={6} count={6} color={C.sunYellow} />
+              <PixelRow x={78} y={7} count={4} color={C.sunYellow} />
+            </G>
+          )}
+
+          {/* ── SUNRISE: SUN low left ── */}
+          {period === 'sunrise' && (
+            <G>
+              <PixelRow x={4}  y={21} count={8}  color={C.sunYellow} />
+              <PixelRow x={3}  y={22} count={10} color={C.sunYellow} />
+              <PixelRow x={3}  y={23} count={10} color={C.sunYellow} />
+              <PixelRow x={4}  y={24} count={8}  color={C.sunYellow} />
+              <Pixel x={2}  y={20} color={C.sunYellow} />
+              <Pixel x={8}  y={19} color={C.sunYellow} />
+              <Pixel x={14} y={20} color={C.sunYellow} />
+              <Pixel x={1}  y={23} color={C.sunYellow} />
+              <Pixel x={15} y={23} color={C.sunYellow} />
+            </G>
+          )}
+
+          {/* ── SUNSET: SUN low right ── */}
+          {period === 'sunset' && (
+            <G>
+              <PixelRow x={78} y={21} count={8}  color={C.sunYellow} />
+              <PixelRow x={77} y={22} count={10} color={C.sunYellow} />
+              <PixelRow x={77} y={23} count={10} color={C.sunYellow} />
+              <PixelRow x={78} y={24} count={8}  color={C.sunYellow} />
+              <Pixel x={76} y={20} color={C.sunYellow} />
+              <Pixel x={82} y={19} color={C.sunYellow} />
+              <Pixel x={88} y={20} color={C.sunYellow} />
+              <Pixel x={75} y={23} color={C.sunYellow} />
+              <Pixel x={89} y={23} color={C.sunYellow} />
+            </G>
+          )}
+
+          {/* ── CLOUDS (day + sunrise) ── */}
+          {(period === 'day' || period === 'sunrise') && (
+            <G>
+              <PixelRow x={10} y={7}  count={5}  color={C.cloudWhite} />
+              <PixelRow x={8}  y={8}  count={9}  color={C.cloudWhite} />
+              <PixelRow x={8}  y={9}  count={9}  color={C.cloudWhite} />
+              <PixelRow x={10} y={10} count={5}  color={C.cloudWhite} />
+              <PixelRow x={48} y={5}  count={6}  color={C.cloudWhite} />
+              <PixelRow x={46} y={6}  count={10} color={C.cloudWhite} />
+              <PixelRow x={46} y={7}  count={10} color={C.cloudWhite} />
+              <PixelRow x={48} y={8}  count={6}  color={C.cloudWhite} />
+            </G>
+          )}
+
+          {/* ── SUNSET CLOUDS ── */}
+          {period === 'sunset' && (
+            <G>
+              <PixelRow x={10} y={7}  count={5}  color="#f0b060" />
+              <PixelRow x={8}  y={8}  count={9}  color="#f0b060" />
+              <PixelRow x={8}  y={9}  count={9}  color="#f0b060" />
+              <PixelRow x={10} y={10} count={5}  color="#f0b060" />
+              <PixelRow x={30} y={9}  count={6}  color="#e89050" />
+              <PixelRow x={28} y={10} count={10} color="#e89050" />
+              <PixelRow x={28} y={11} count={10} color="#e89050" />
+              <PixelRow x={30} y={12} count={6}  color="#e89050" />
+            </G>
+          )}
+
+          {/* ── DISTANT MOUNTAINS ── */}
           <G>
-            <Pixel x={3}  y={2}  color={C.starWhite} />
-            <Pixel x={9}  y={4}  color={C.starWhite} />
-            <Pixel x={15} y={1}  color={C.starWhite} />
-            <Pixel x={22} y={3}  color={C.starWhite} />
-            <Pixel x={30} y={5}  color={C.starWhite} />
-            <Pixel x={37} y={2}  color={C.starWhite} />
-            <Pixel x={44} y={4}  color={C.starWhite} />
-            <Pixel x={52} y={1}  color={C.starWhite} />
-            <Pixel x={58} y={3}  color={C.starWhite} />
-            <Pixel x={65} y={5}  color={C.starWhite} />
-            <Pixel x={71} y={2}  color={C.starWhite} />
-            <Pixel x={6}  y={8}  color={C.starWhite} />
-            <Pixel x={18} y={10} color={C.starWhite} />
-            <Pixel x={26} y={7}  color={C.starWhite} />
-            <Pixel x={35} y={11} color={C.starWhite} />
-            <Pixel x={48} y={9}  color={C.starWhite} />
-            <Pixel x={60} y={8}  color={C.starWhite} />
-            <Pixel x={68} y={11} color={C.starWhite} />
-            <Pixel x={75} y={7}  color={C.starWhite} />
-            {/* Slightly brighter 2-pixel stars */}
-            <PixelRow x={12} y={6}  count={2} color={C.starWhite} />
-            <PixelRow x={42} y={8}  count={2} color={C.starWhite} />
-            <PixelRow x={63} y={6}  count={2} color={C.starWhite} />
+            <PixelRow x={60} y={16} count={2}  color={mtn1Color} />
+            <PixelRow x={58} y={17} count={6}  color={mtn1Color} />
+            <PixelRow x={56} y={18} count={10} color={mtn1Color} />
+            <PixelRow x={55} y={19} count={12} color={mtn1Color} />
+            <PixelRow x={72} y={15} count={2}  color={mtn2Color} />
+            <PixelRow x={70} y={16} count={6}  color={mtn2Color} />
+            <PixelRow x={68} y={17} count={10} color={mtn2Color} />
+            <PixelRow x={67} y={18} count={12} color={mtn2Color} />
+            <PixelRow x={66} y={19} count={14} color={mtn2Color} />
           </G>
-        )}
 
-        {/* ── NIGHT: MOON (top-right) ── */}
-        {period === 'night' && (
+          {/* ── GROUND / GRASS ── */}
+          <Rect x={0} y={26 * PX} width={W * PX} height={14 * PX} fill={grassMain} />
+          <PixelRow x={0} y={26} count={95} color={grassEdge} />
+          <PixelRow x={0} y={27} count={95} color={grassMain} />
+
+          {/* ── DIRT TRAIL ── */}
+          <Rect x={0} y={32 * PX} width={W * PX} height={6 * PX} fill={C.dirtBrown} />
+          <PixelRow x={0} y={32} count={95} color={C.dirtDark} />
+          <PixelRow x={0} y={34} count={95} color={C.dirtDark} />
+          <PixelRow x={0} y={36} count={95} color={C.dirtDark} />
+          <PixelRow x={0} y={37} count={95} color={C.dirtDark} />
+
+          {/* ── GRASS FOREGROUND ── */}
+          <Rect x={0} y={38 * PX} width={W * PX} height={8 * PX} fill={grassMain} />
+          <PixelRow x={0} y={38} count={95} color={grassEdge} />
+          <Pixel x={5}  y={39} color={grassEdge} />
+          <Pixel x={6}  y={38} color={grassEdge} />
+          <Pixel x={20} y={39} color={grassEdge} />
+          <Pixel x={21} y={38} color={grassEdge} />
+          <Pixel x={40} y={39} color={grassEdge} />
+          <Pixel x={41} y={38} color={grassEdge} />
+          <Pixel x={65} y={39} color={grassEdge} />
+          <Pixel x={66} y={38} color={grassEdge} />
+          <Pixel x={80} y={39} color={grassEdge} />
+          <Pixel x={81} y={38} color={grassEdge} />
+
+          {/* ── TREE ── */}
           <G>
-            {/* Full circle */}
-            <PixelRow x={77} y={3} count={4} color={C.moonWhite} />
-            <PixelRow x={76} y={4} count={6} color={C.moonWhite} />
-            <PixelRow x={76} y={5} count={6} color={C.moonWhite} />
-            <PixelRow x={76} y={6} count={6} color={C.moonWhite} />
-            <PixelRow x={77} y={7} count={4} color={C.moonWhite} />
-            {/* Crescent shadow — overdraws right side to create crescent */}
-            <PixelRow x={79} y={3} count={2} color={C.skyBlue} />
-            <PixelRow x={80} y={4} count={2} color={C.skyBlue} />
-            <PixelRow x={80} y={5} count={2} color={C.skyBlue} />
-            <PixelRow x={80} y={6} count={2} color={C.skyBlue} />
-            <PixelRow x={79} y={7} count={2} color={C.skyBlue} />
+            <PixelRow x={85} y={24} count={2} color={C.treeTrunk} />
+            <PixelRow x={85} y={25} count={2} color={C.treeTrunk} />
+            <PixelRow x={85} y={26} count={2} color={C.treeTrunk} />
+            <PixelRow x={83} y={20} count={6} color={C.treeGreen} />
+            <PixelRow x={82} y={21} count={8} color={C.treeGreen} />
+            <PixelRow x={82} y={22} count={8} color={C.treeGreen} />
+            <PixelRow x={83} y={23} count={6} color={C.treeGreen} />
+            <PixelRow x={84} y={24} count={4} color={C.treeGreen} />
           </G>
-        )}
 
-        {/* ── DAY: SUN (top right) ── */}
-        {period === 'day' && (
+          {/* ── OXEN (+8 from previous) ── */}
           <G>
-            <PixelRow x={78} y={3} count={4} color={C.sunYellow} />
-            <PixelRow x={77} y={4} count={6} color={C.sunYellow} />
-            <PixelRow x={77} y={5} count={6} color={C.sunYellow} />
-            <PixelRow x={77} y={6} count={6} color={C.sunYellow} />
-            <PixelRow x={78} y={7} count={4} color={C.sunYellow} />
+            <PixelRow x={31} y={28} count={8}  color={C.oxWhite} />
+            <PixelRow x={30} y={29} count={10} color={C.oxWhite} />
+            <PixelRow x={30} y={30} count={10} color={C.oxWhite} />
+            <PixelRow x={31} y={31} count={8}  color={C.oxWhite} />
+            {/* Head */}
+            <PixelRow x={28} y={28} count={4}  color={C.oxWhite} />
+            <PixelRow x={28} y={29} count={4}  color={C.oxWhite} />
+            {/* Horns */}
+            <Pixel x={28} y={27} color={C.oxGray} />
+            <Pixel x={30} y={26} color={C.oxGray} />
+            {/* Eye */}
+            <Pixel x={28} y={28} color={C.black} />
+            {/* Legs */}
+            <Pixel x={32} y={32} color={C.oxGray} />
+            <Pixel x={32} y={33} color={C.oxGray} />
+            <Pixel x={34} y={32} color={C.oxGray} />
+            <Pixel x={34} y={33} color={C.oxGray} />
+            <Pixel x={36} y={32} color={C.oxGray} />
+            <Pixel x={36} y={33} color={C.oxGray} />
+            <Pixel x={38} y={32} color={C.oxGray} />
+            <Pixel x={38} y={33} color={C.oxGray} />
           </G>
-        )}
 
-        {/* ── SUNRISE: SUN low on left horizon ── */}
-        {period === 'sunrise' && (
+          {/* ── YOKE (+8) ── */}
+          <PixelRow x={40} y={30} count={6} color={C.woodBrown} />
+
+          {/* ── WAGON BOX (+8) ── */}
           <G>
-            {/* Sun peeking up — half circle at horizon */}
-            <PixelRow x={4}  y={21} count={8} color={C.sunYellow} />
-            <PixelRow x={3}  y={22} count={10} color={C.sunYellow} />
-            <PixelRow x={3}  y={23} count={10} color={C.sunYellow} />
-            <PixelRow x={4}  y={24} count={8} color={C.sunYellow} />
-            {/* Rays */}
-            <Pixel x={2}  y={20} color={C.sunYellow} />
-            <Pixel x={8}  y={19} color={C.sunYellow} />
-            <Pixel x={14} y={20} color={C.sunYellow} />
-            <Pixel x={1}  y={23} color={C.sunYellow} />
-            <Pixel x={15} y={23} color={C.sunYellow} />
+            <PixelRow x={46} y={27} count={18} color={C.woodBrown} />
+            <PixelRow x={46} y={28} count={18} color={C.woodBrown} />
+            <PixelRow x={46} y={29} count={18} color={C.woodBrown} />
+            <PixelRow x={46} y={30} count={18} color={C.woodBrown} />
+            <PixelRow x={46} y={31} count={18} color={C.woodBrown} />
+            {/* Plank lines */}
+            <Pixel x={50} y={27} color={C.dirtDark} />
+            <Pixel x={50} y={28} color={C.dirtDark} />
+            <Pixel x={50} y={29} color={C.dirtDark} />
+            <Pixel x={50} y={30} color={C.dirtDark} />
+            <Pixel x={54} y={27} color={C.dirtDark} />
+            <Pixel x={54} y={28} color={C.dirtDark} />
+            <Pixel x={54} y={29} color={C.dirtDark} />
+            <Pixel x={54} y={30} color={C.dirtDark} />
+            <Pixel x={58} y={27} color={C.dirtDark} />
+            <Pixel x={58} y={28} color={C.dirtDark} />
+            <Pixel x={58} y={29} color={C.dirtDark} />
+            <Pixel x={58} y={30} color={C.dirtDark} />
+            {/* Top rail */}
+            <PixelRow x={46} y={26} count={18} color={C.dirtDark} />
+            {/* Bottom rail */}
+            <PixelRow x={46} y={32} count={18} color={C.dirtDark} />
           </G>
-        )}
 
-        {/* ── SUNSET: SUN low on right horizon ── */}
-        {period === 'sunset' && (
+          {/* ── CANVAS COVER (+8) ── */}
           <G>
-            {/* Sun sinking — half circle at horizon right side */}
-            <PixelRow x={78} y={21} count={8} color={C.sunYellow} />
-            <PixelRow x={77} y={22} count={10} color={C.sunYellow} />
-            <PixelRow x={77} y={23} count={10} color={C.sunYellow} />
-            <PixelRow x={78} y={24} count={8} color={C.sunYellow} />
-            {/* Rays */}
-            <Pixel x={76} y={20} color={C.sunYellow} />
-            <Pixel x={82} y={19} color={C.sunYellow} />
-            <Pixel x={88} y={20} color={C.sunYellow} />
-            <Pixel x={75} y={23} color={C.sunYellow} />
-            <Pixel x={89} y={23} color={C.sunYellow} />
+            <PixelRow x={47} y={22} count={16} color={C.wagonCream} />
+            <PixelRow x={46} y={23} count={18} color={C.wagonCream} />
+            <PixelRow x={46} y={24} count={18} color={C.wagonCream} />
+            <PixelRow x={46} y={25} count={18} color={C.wagonCream} />
+            <PixelRow x={47} y={21} count={14} color={C.wagonCream} />
+            <PixelRow x={49} y={20} count={10} color={C.wagonCream} />
+            <PixelRow x={51} y={19} count={6}  color={C.wagonCream} />
+            {/* Canvas ribs */}
+            <Pixel x={49} y={20} color={C.offWhite} />
+            <Pixel x={49} y={21} color={C.offWhite} />
+            <Pixel x={54} y={19} color={C.offWhite} />
+            <Pixel x={54} y={20} color={C.offWhite} />
+            <Pixel x={54} y={21} color={C.offWhite} />
+            <Pixel x={59} y={20} color={C.offWhite} />
+            <Pixel x={59} y={21} color={C.offWhite} />
           </G>
-        )}
 
-        {/* ── CLOUDS (day + sunrise only) ── */}
-        {(period === 'day' || period === 'sunrise') && (
+          {/* ── FRONT WHEEL (+8) ── */}
           <G>
-            <PixelRow x={10} y={7}  count={5} color={C.cloudWhite} />
-            <PixelRow x={8}  y={8}  count={9} color={C.cloudWhite} />
-            <PixelRow x={8}  y={9}  count={9} color={C.cloudWhite} />
-            <PixelRow x={10} y={10} count={5} color={C.cloudWhite} />
-            <PixelRow x={48} y={5}  count={6} color={C.cloudWhite} />
-            <PixelRow x={46} y={6}  count={10} color={C.cloudWhite} />
-            <PixelRow x={46} y={7}  count={10} color={C.cloudWhite} />
-            <PixelRow x={48} y={8}  count={6} color={C.cloudWhite} />
+            <PixelRow x={47} y={32} count={4} color={C.wheelDark} />
+            <PixelRow x={46} y={33} count={6} color={C.wheelDark} />
+            <PixelRow x={46} y={34} count={6} color={C.wheelDark} />
+            <PixelRow x={46} y={35} count={6} color={C.wheelDark} />
+            <PixelRow x={47} y={36} count={4} color={C.wheelDark} />
+            <Pixel x={48} y={34} color={C.dirtBrown} />
+            <Pixel x={49} y={34} color={C.dirtBrown} />
+            <Pixel x={49} y={33} color={C.woodBrown} />
+            <Pixel x={49} y={35} color={C.woodBrown} />
+            <Pixel x={47} y={34} color={C.woodBrown} />
+            <Pixel x={51} y={34} color={C.woodBrown} />
           </G>
-        )}
 
-        {/* Sunset clouds — orange-tinted */}
-        {period === 'sunset' && (
+          {/* ── REAR WHEEL (+8) ── */}
           <G>
-            <PixelRow x={10} y={7}  count={5} color="#f0b060" />
-            <PixelRow x={8}  y={8}  count={9} color="#f0b060" />
-            <PixelRow x={8}  y={9}  count={9} color="#f0b060" />
-            <PixelRow x={10} y={10} count={5} color="#f0b060" />
-            <PixelRow x={30} y={9}  count={6} color="#e89050" />
-            <PixelRow x={28} y={10} count={10} color="#e89050" />
-            <PixelRow x={28} y={11} count={10} color="#e89050" />
-            <PixelRow x={30} y={12} count={6} color="#e89050" />
+            <PixelRow x={58} y={31} count={6}  color={C.wheelDark} />
+            <PixelRow x={56} y={32} count={10} color={C.wheelDark} />
+            <PixelRow x={56} y={33} count={10} color={C.wheelDark} />
+            <PixelRow x={56} y={34} count={10} color={C.wheelDark} />
+            <PixelRow x={56} y={35} count={10} color={C.wheelDark} />
+            <PixelRow x={56} y={36} count={10} color={C.wheelDark} />
+            <PixelRow x={58} y={37} count={6}  color={C.wheelDark} />
+            <PixelRow x={59} y={34} count={4}  color={C.dirtBrown} />
+            <Pixel x={61} y={32} color={C.woodBrown} />
+            <Pixel x={61} y={33} color={C.woodBrown} />
+            <Pixel x={61} y={35} color={C.woodBrown} />
+            <Pixel x={61} y={36} color={C.woodBrown} />
+            <Pixel x={57} y={34} color={C.woodBrown} />
+            <Pixel x={58} y={34} color={C.woodBrown} />
+            <Pixel x={63} y={34} color={C.woodBrown} />
+            <Pixel x={64} y={34} color={C.woodBrown} />
           </G>
-        )}
 
-        {/* ── DISTANT MOUNTAINS ── */}
-        <G>
-          <PixelRow x={60} y={16} count={2}  color={mtn1Color} />
-          <PixelRow x={58} y={17} count={6}  color={mtn1Color} />
-          <PixelRow x={56} y={18} count={10} color={mtn1Color} />
-          <PixelRow x={55} y={19} count={12} color={mtn1Color} />
-          <PixelRow x={72} y={15} count={2}  color={mtn2Color} />
-          <PixelRow x={70} y={16} count={6}  color={mtn2Color} />
-          <PixelRow x={68} y={17} count={10} color={mtn2Color} />
-          <PixelRow x={67} y={18} count={12} color={mtn2Color} />
-          <PixelRow x={66} y={19} count={14} color={mtn2Color} />
-        </G>
+          {/* ── DESTINATION FLAG ── */}
+          <G>
+            <Pixel x={91} y={22} color={C.offWhite} />
+            <Pixel x={91} y={23} color={C.offWhite} />
+            <Pixel x={91} y={24} color={C.offWhite} />
+            <Pixel x={91} y={25} color={C.offWhite} />
+            <Pixel x={91} y={26} color={C.offWhite} />
+            <PixelRow x={92} y={22} count={3} color={C.gold} />
+            <PixelRow x={92} y={23} count={3} color={C.gold} />
+            <PixelRow x={92} y={24} count={2} color={C.gold} />
+          </G>
 
-        {/* ── GROUND / GRASS ── */}
-        <Rect x={0} y={26 * PX} width={W * PX} height={14 * PX} fill={grassMain} />
-        <PixelRow x={0} y={26} count={95} color={grassEdge} />
-        <PixelRow x={0} y={27} count={95} color={grassMain} />
+          {/* ── PROGRESS BAR ── */}
+          <Rect x={0} y={46 * PX} width={W * PX} height={6 * PX} fill={C.black} />
+          <Rect x={4 * PX} y={48 * PX} width={87 * PX} height={2 * PX} fill={C.darkGray} />
+          <Rect
+            x={4 * PX}
+            y={48 * PX}
+            width={Math.max(2, (progressPercent / 100) * 87) * PX}
+            height={2 * PX}
+            fill={C.gold}
+          />
+          <Pixel
+            x={Math.round(4 + (progressPercent / 100) * 87)}
+            y={47}
+            color={C.white}
+          />
 
-        {/* ── DIRT TRAIL ── */}
-        <Rect x={0} y={32 * PX} width={W * PX} height={6 * PX} fill={C.dirtBrown} />
-        <PixelRow x={0} y={32} count={95} color={C.dirtDark} />
-        <PixelRow x={0} y={34} count={95} color={C.dirtDark} />
-        <PixelRow x={0} y={36} count={95} color={C.dirtDark} />
-        <PixelRow x={0} y={37} count={95} color={C.dirtDark} />
-
-        {/* ── GRASS FOREGROUND ── */}
-        <Rect x={0} y={38 * PX} width={W * PX} height={8 * PX} fill={grassMain} />
-        <PixelRow x={0} y={38} count={95} color={grassEdge} />
-        <Pixel x={5}  y={39} color={grassEdge} />
-        <Pixel x={6}  y={38} color={grassEdge} />
-        <Pixel x={20} y={39} color={grassEdge} />
-        <Pixel x={21} y={38} color={grassEdge} />
-        <Pixel x={40} y={39} color={grassEdge} />
-        <Pixel x={41} y={38} color={grassEdge} />
-        <Pixel x={65} y={39} color={grassEdge} />
-        <Pixel x={66} y={38} color={grassEdge} />
-        <Pixel x={80} y={39} color={grassEdge} />
-        <Pixel x={81} y={38} color={grassEdge} />
-
-        {/* ── TREE ── */}
-        <G>
-          <PixelRow x={85} y={24} count={2} color={C.treeTrunk} />
-          <PixelRow x={85} y={25} count={2} color={C.treeTrunk} />
-          <PixelRow x={85} y={26} count={2} color={C.treeTrunk} />
-          <PixelRow x={83} y={20} count={6} color={C.treeGreen} />
-          <PixelRow x={82} y={21} count={8} color={C.treeGreen} />
-          <PixelRow x={82} y={22} count={8} color={C.treeGreen} />
-          <PixelRow x={83} y={23} count={6} color={C.treeGreen} />
-          <PixelRow x={84} y={24} count={4} color={C.treeGreen} />
-        </G>
-
-        {/* ── OXEN ── */}
-        <G>
-          <PixelRow x={23} y={28} count={8}  color={C.oxWhite} />
-          <PixelRow x={22} y={29} count={10} color={C.oxWhite} />
-          <PixelRow x={22} y={30} count={10} color={C.oxWhite} />
-          <PixelRow x={23} y={31} count={8}  color={C.oxWhite} />
-          <PixelRow x={20} y={28} count={4}  color={C.oxWhite} />
-          <PixelRow x={20} y={29} count={4}  color={C.oxWhite} />
-          <Pixel x={20} y={27} color={C.oxGray} />
-          <Pixel x={22} y={26} color={C.oxGray} />
-          <Pixel x={20} y={28} color={C.black} />
-          <Pixel x={24} y={32} color={C.oxGray} />
-          <Pixel x={24} y={33} color={C.oxGray} />
-          <Pixel x={26} y={32} color={C.oxGray} />
-          <Pixel x={26} y={33} color={C.oxGray} />
-          <Pixel x={28} y={32} color={C.oxGray} />
-          <Pixel x={28} y={33} color={C.oxGray} />
-          <Pixel x={30} y={32} color={C.oxGray} />
-          <Pixel x={30} y={33} color={C.oxGray} />
-        </G>
-
-        {/* ── YOKE ── */}
-        <PixelRow x={32} y={30} count={6} color={C.woodBrown} />
-
-        {/* ── WAGON BOX ── */}
-        <G>
-          <PixelRow x={38} y={27} count={18} color={C.woodBrown} />
-          <PixelRow x={38} y={28} count={18} color={C.woodBrown} />
-          <PixelRow x={38} y={29} count={18} color={C.woodBrown} />
-          <PixelRow x={38} y={30} count={18} color={C.woodBrown} />
-          <PixelRow x={38} y={31} count={18} color={C.woodBrown} />
-          <Pixel x={42} y={27} color={C.dirtDark} />
-          <Pixel x={42} y={28} color={C.dirtDark} />
-          <Pixel x={42} y={29} color={C.dirtDark} />
-          <Pixel x={42} y={30} color={C.dirtDark} />
-          <Pixel x={46} y={27} color={C.dirtDark} />
-          <Pixel x={46} y={28} color={C.dirtDark} />
-          <Pixel x={46} y={29} color={C.dirtDark} />
-          <Pixel x={46} y={30} color={C.dirtDark} />
-          <Pixel x={50} y={27} color={C.dirtDark} />
-          <Pixel x={50} y={28} color={C.dirtDark} />
-          <Pixel x={50} y={29} color={C.dirtDark} />
-          <Pixel x={50} y={30} color={C.dirtDark} />
-          <PixelRow x={38} y={26} count={18} color={C.dirtDark} />
-          <PixelRow x={38} y={32} count={18} color={C.dirtDark} />
-        </G>
-
-        {/* ── CANVAS COVER ── */}
-        <G>
-          <PixelRow x={39} y={22} count={16} color={C.wagonCream} />
-          <PixelRow x={38} y={23} count={18} color={C.wagonCream} />
-          <PixelRow x={38} y={24} count={18} color={C.wagonCream} />
-          <PixelRow x={38} y={25} count={18} color={C.wagonCream} />
-          <PixelRow x={39} y={21} count={14} color={C.wagonCream} />
-          <PixelRow x={41} y={20} count={10} color={C.wagonCream} />
-          <PixelRow x={43} y={19} count={6}  color={C.wagonCream} />
-          <Pixel x={41} y={20} color={C.offWhite} />
-          <Pixel x={41} y={21} color={C.offWhite} />
-          <Pixel x={46} y={19} color={C.offWhite} />
-          <Pixel x={46} y={20} color={C.offWhite} />
-          <Pixel x={46} y={21} color={C.offWhite} />
-          <Pixel x={51} y={20} color={C.offWhite} />
-          <Pixel x={51} y={21} color={C.offWhite} />
-        </G>
-
-        {/* ── FRONT WHEEL ── */}
-        <G>
-          <PixelRow x={39} y={32} count={4} color={C.wheelDark} />
-          <PixelRow x={38} y={33} count={6} color={C.wheelDark} />
-          <PixelRow x={38} y={34} count={6} color={C.wheelDark} />
-          <PixelRow x={38} y={35} count={6} color={C.wheelDark} />
-          <PixelRow x={39} y={36} count={4} color={C.wheelDark} />
-          <Pixel x={40} y={34} color={C.dirtBrown} />
-          <Pixel x={41} y={34} color={C.dirtBrown} />
-          <Pixel x={41} y={33} color={C.woodBrown} />
-          <Pixel x={41} y={35} color={C.woodBrown} />
-          <Pixel x={39} y={34} color={C.woodBrown} />
-          <Pixel x={43} y={34} color={C.woodBrown} />
-        </G>
-
-        {/* ── REAR WHEEL ── */}
-        <G>
-          <PixelRow x={50} y={31} count={6}  color={C.wheelDark} />
-          <PixelRow x={48} y={32} count={10} color={C.wheelDark} />
-          <PixelRow x={48} y={33} count={10} color={C.wheelDark} />
-          <PixelRow x={48} y={34} count={10} color={C.wheelDark} />
-          <PixelRow x={48} y={35} count={10} color={C.wheelDark} />
-          <PixelRow x={48} y={36} count={10} color={C.wheelDark} />
-          <PixelRow x={50} y={37} count={6}  color={C.wheelDark} />
-          <PixelRow x={51} y={34} count={4}  color={C.dirtBrown} />
-          <Pixel x={53} y={32} color={C.woodBrown} />
-          <Pixel x={53} y={33} color={C.woodBrown} />
-          <Pixel x={53} y={35} color={C.woodBrown} />
-          <Pixel x={53} y={36} color={C.woodBrown} />
-          <Pixel x={49} y={34} color={C.woodBrown} />
-          <Pixel x={50} y={34} color={C.woodBrown} />
-          <Pixel x={55} y={34} color={C.woodBrown} />
-          <Pixel x={56} y={34} color={C.woodBrown} />
-        </G>
-
-        {/* ── DESTINATION FLAG ── */}
-        <G>
-          <Pixel x={91} y={22} color={C.offWhite} />
-          <Pixel x={91} y={23} color={C.offWhite} />
-          <Pixel x={91} y={24} color={C.offWhite} />
-          <Pixel x={91} y={25} color={C.offWhite} />
-          <Pixel x={91} y={26} color={C.offWhite} />
-          <PixelRow x={92} y={22} count={3} color={C.gold} />
-          <PixelRow x={92} y={23} count={3} color={C.gold} />
-          <PixelRow x={92} y={24} count={2} color={C.gold} />
-        </G>
-
-        {/* ── PROGRESS BAR ── */}
-        <Rect x={0} y={46 * PX} width={W * PX} height={6 * PX} fill={C.black} />
-        <Rect x={4 * PX} y={48 * PX} width={87 * PX} height={2 * PX} fill={C.darkGray} />
-        <Rect
-          x={4 * PX}
-          y={48 * PX}
-          width={Math.max(2, (progressPercent / 100) * 87) * PX}
-          height={2 * PX}
-          fill={C.gold}
-        />
-        <Pixel
-          x={Math.round(4 + (progressPercent / 100) * 87)}
-          y={47}
-          color={C.white}
-        />
-
-      </Svg>
+        </Svg>
       </View>
 
       <View style={[styles.infoRow, { backgroundColor: colors.inkBrown }]}>
