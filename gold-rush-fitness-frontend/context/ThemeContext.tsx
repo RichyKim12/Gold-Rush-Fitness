@@ -12,77 +12,71 @@ interface ThemeContextType {
   colors: typeof DarkColors;
 }
 
-// ─── Dark palette (original) ───────────────────────────────────────────────
+// ─── DARK palette ────────────────────────────────────────────────────────────
 export const DarkColors = {
-  // UI surfaces
   bgDeep: '#0a0600',
   bgCard: 'rgba(30, 18, 6, 0.85)',
   bgCardLight: 'rgba(242, 232, 208, 0.08)',
   border: 'rgba(212, 160, 23, 0.3)',
 
-  // Text
   parchment: '#f2e8d0',
   parchmentDark: '#c9b99a',
   inkDark: '#1a0f00',
   inkBrown: '#3d2b1f',
   dirtLight: '#c4956a',
 
-  // Gradient stops for LinearGradient (must be plain strings, no rgba)
   gradientTop: '#0a0600',
   gradientBottom: '#3d2b1f',
 
-  // Accents
   trailGold: '#d4a017',
   sunOrange: '#e8873a',
   sunGold: '#f5c842',
   dirt: '#8b5e3c',
   dirtDark: '#5c3d1e',
 
-  // Health
   healthFull: '#5cb85c',
   healthGood: '#f0ad4e',
   healthLow: '#d9534f',
   healthEmpty: '#4a2020',
 
-  // Scene colors (unchanged in both modes — it's always a sunset)
   skyDark: '#0d1b2a',
   skyMid: '#1b3a5c',
   skyHorizon: '#c17f3a',
 };
 
-// ─── Light palette ──────────────────────────────────────────────────────────
+// ─── LIGHT palette — high contrast ──────────────────────────────────────────
 export const LightColors: typeof DarkColors = {
-  // UI surfaces
-  bgDeep: '#f5efe0',
-  bgCard: 'rgba(255, 248, 235, 0.95)',
-  bgCardLight: 'rgba(139, 94, 60, 0.07)',
-  border: 'rgba(180, 120, 20, 0.3)',
+  // Surfaces — warm cream
+  bgDeep: '#f0e6cc',
+  bgCard: 'rgba(255, 252, 242, 0.97)',
+  bgCardLight: 'rgba(100, 60, 10, 0.09)',
+  border: 'rgba(100, 60, 10, 0.3)',
 
-  // Text
-  parchment: '#2c1a08',
-  parchmentDark: '#5c3d1e',
-  inkDark: '#1a0f00',
-  inkBrown: '#f0e6cc',
-  dirtLight: '#7a4f2c',
+  // Text — near-black for maximum contrast on cream
+  parchment: '#0f0700',           // almost black — main text
+  parchmentDark: '#2a1400',       // very dark brown — secondary text
+  inkDark: '#000000',
+  inkBrown: '#e8d5a8',            // light cream — used as bg in WagonScene infoRow
+  dirtLight: '#4a2200',           // dark brown — hint/muted text
 
-  // Gradient stops
-  gradientTop: '#f5efe0',
-  gradientBottom: '#e8d5a8',
+  // Gradient
+  gradientTop: '#f0e6cc',
+  gradientBottom: '#d8c088',
 
-  // Accents
-  trailGold: '#b8860b',
-  sunOrange: '#c0621a',
-  sunGold: '#d4a017',
-  dirt: '#8b5e3c',
+  // Accents — deep and saturated for contrast on light bg
+  trailGold: '#7a4e00',           // deep dark gold
+  sunOrange: '#8a3a00',           // deep burnt orange
+  sunGold: '#9a6200',
+  dirt: '#6b3c18',
   dirtDark: '#c4956a',
 
-  // Health
-  healthFull: '#3a8a3a',
-  healthGood: '#c87d20',
-  healthLow: '#b03030',
-  healthEmpty: '#d4b896',
+  // Health — deep saturated for visibility on light cards
+  healthFull: '#1a6e1a',          // deep green
+  healthGood: '#8a5200',          // deep amber
+  healthLow: '#8a1a1a',           // deep red
+  healthEmpty: '#c8a880',
 
-  // Scene (same sunset always)
+  // Scene (always same)
   skyDark: '#0d1b2a',
   skyMid: '#1b3a5c',
   skyHorizon: '#c17f3a',
@@ -116,3 +110,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 export function useTheme() {
   return useContext(ThemeContext);
 }
+
+// ─── Font helper ─────────────────────────────────────────────────────────────
+// Use this instead of fontFamily: 'monospace' everywhere
+export const PIXEL_FONT = 'PressStart2P_400Regular';

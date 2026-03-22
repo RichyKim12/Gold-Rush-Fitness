@@ -4,8 +4,9 @@
 export { DarkColors as Colors } from '../context/ThemeContext';
 
 export const Fonts = {
-  display: 'serif',
-  body: 'monospace',
+  display: 'PressStart2P_400Regular',
+  body: 'PressStart2P_400Regular',
+  mono: 'PressStart2P_400Regular',
 };
 
 export const TRAIL_TOTAL_MILES = 2170;
