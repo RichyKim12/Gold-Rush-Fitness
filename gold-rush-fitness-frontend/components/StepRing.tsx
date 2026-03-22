@@ -4,6 +4,7 @@ import { View, Text, Animated, StyleSheet } from 'react-native';
 import Svg, { Circle, Defs, LinearGradient, Stop } from 'react-native-svg';
 import { useTheme } from '../context/ThemeContext';
 import { DAILY_STEP_GOAL } from '../constants/theme';
+import { StepsIcon } from './PixelIcons';
 
 interface StepRingProps {
   steps: number;
@@ -75,7 +76,7 @@ export default function StepRing({ steps, goal = DAILY_STEP_GOAL }: StepRingProp
 
       {/* Center content */}
       <View style={styles.center}>
-        <Text style={styles.emoji}>👢</Text>
+        <StepsIcon size={18} />
         <Text style={[styles.steps, { color: colors.parchment }]}>
           {steps.toLocaleString()}
         </Text>
@@ -101,7 +102,6 @@ export default function StepRing({ steps, goal = DAILY_STEP_GOAL }: StepRingProp
   );
 }
 
-// Only truly static layout styles here — no colors
 const styles = StyleSheet.create({
   container: {
     alignItems: 'center',
@@ -115,15 +115,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  emoji: {
-    fontSize: 18,
-    marginBottom: 2,
-  },
   steps: {
     fontFamily: 'monospace',
     fontSize: 20,
     fontWeight: 'bold',
     lineHeight: 22,
+    marginTop: 2,
   },
   label: {
     fontFamily: 'monospace',

@@ -5,31 +5,48 @@ import {
   Text,
   ScrollView,
   StyleSheet,
-  TouchableOpacity,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useTheme } from '../../context/ThemeContext';
 import { MOCK_STATE } from '../../constants/mockData';
 import HealthBar from '../../components/HealthBar';
+import {
+  MedicIcon,
+  StreakIcon,
+  CheckIcon,
+  XIcon,
+  StarIcon,
+  DysenteryIcon,
+  ExhaustionIcon,
+  DehydrationIcon,
+  SkullIcon,
+  HealthIcon,
+} from '../../components/PixelIcons';
 
-const AILMENTS = [
-  { name: 'Dysentery', risk: 'Low', emoji: '🤒', tip: 'Keep up your steps to stay fit' },
-  { name: 'Exhaustion', risk: 'Medium', emoji: '😴', tip: 'You missed 2 step goals recently' },
-  { name: 'Broken Leg', risk: 'Low', emoji: '🦴', tip: 'Good pace reduces injury risk' },
-  { name: 'Cholera', risk: 'Low', emoji: '🤧', tip: 'Consistency keeps illness away' },
+type AilmentKey = 'Dysentery' | 'Exhaustion' | 'Dehyrdration' | 'TBD';
+
+const AILMENT_ICONS: Record<AilmentKey, React.ReactNode> = {
+  Dysentery:    <DysenteryIcon size={22} />,
+  Exhaustion:   <ExhaustionIcon size={22} />,
+  Dehyrdration: <DehydrationIcon size={22} />,
+  TBD:          <SkullIcon size={22} />,
+};
+
+const AILMENTS: { name: AilmentKey; risk: string; tip: string }[] = [
+  { name: 'Dysentery',    risk: 'Low',      tip: 'Keep up your steps to stay fit' },
+  { name: 'Exhaustion',   risk: 'Medium',   tip: 'You missed 2 step goals recently' },
+  { name: 'Dehyrdration', risk: 'High',     tip: 'Good pace reduces injury risk' },
+  { name: 'TBD',          risk: 'Critical', tip: 'Consistency keeps illness away' },
 ];
 
 export default function HealthScreen() {
   const { colors } = useTheme();
   const state = MOCK_STATE;
 
-  const daysHit = state.weekHistory.filter((d) => d.goalMet).length;
-  const consistency = Math.round((daysHit / 7) * 100);
-
   const RISK_COLORS: Record<string, string> = {
-    Low: colors.healthFull,
-    Medium: colors.healthGood,
-    High: colors.healthLow,
+    Low:      colors.healthFull,
+    Medium:   colors.healthGood,
+    High:     colors.healthLow,
     Critical: colors.healthEmpty,
   };
 
@@ -41,8 +58,12 @@ export default function HealthScreen() {
       style={s.root}
     >
       <ScrollView contentContainerStyle={s.scroll} showsVerticalScrollIndicator={false}>
-        <Text style={s.screenTitle}>⚕️ Party Health Report</Text>
-        <Text style={s.screenSub}>A healthy party moves farther, faster</Text>
+
+        {/* Title */}
+        <View style={s.titleRow}>
+          <HealthIcon size={22} />
+          <Text style={s.screenTitle}>Health Report</Text>
+        </View>
 
         {/* Overall health */}
         <View style={s.overallCard}>
@@ -55,26 +76,14 @@ export default function HealthScreen() {
           </View>
         </View>
 
-        {/* All health bars */}
-        {/* <View style={s.barsCard}>
-          <Text style={s.cardTitle}>VITALS</Text>
-          <HealthBar score={state.healthScore} label="Your Vitality" showDetails />
-          <View style={s.divider} />
-          <HealthBar score={Math.max(0, state.healthScore - 8)} label="Oxen Strength" showDetails />
-          <View style={s.divider} />
-          <HealthBar score={Math.max(0, state.healthScore - 15)} label="Wagon Condition" showDetails />
-          <View style={s.divider} />
-          <HealthBar score={Math.max(0, state.healthScore + 10)} label="Morale" showDetails />
-          <View style={s.divider} />
-          <HealthBar score={Math.max(0, state.healthScore - 5)} label="Food Supply" showDetails />
-        </View> */}
-
         {/* Ailment risks */}
         <View style={s.ailmentsCard}>
           <Text style={s.cardTitle}>AILMENT RISK TRACKER</Text>
           {AILMENTS.map((a, i) => (
             <View key={i} style={s.ailmentRow}>
-              <Text style={s.ailmentEmoji}>{a.emoji}</Text>
+              <View style={s.ailmentIconWrap}>
+                {AILMENT_ICONS[a.name]}
+              </View>
               <View style={s.ailmentInfo}>
                 <Text style={s.ailmentName}>{a.name}</Text>
                 <Text style={s.ailmentTip}>{a.tip}</Text>
@@ -98,28 +107,28 @@ export default function HealthScreen() {
         <View style={s.formulaCard}>
           <Text style={s.cardTitle}>HOW IT'S CALCULATED</Text>
           <View style={s.formulaRow}>
-            <Text style={s.formulaEmoji}>✅</Text>
+            <CheckIcon size={18} />
             <View style={s.formulaText}>
               <Text style={s.formulaLabel}>Daily goal met</Text>
               <Text style={s.formulaValue}>+10 vitality</Text>
             </View>
           </View>
           <View style={s.formulaRow}>
-            <Text style={s.formulaEmoji}>❌</Text>
+            <XIcon size={18} />
             <View style={s.formulaText}>
               <Text style={s.formulaLabel}>Goal missed</Text>
               <Text style={s.formulaValue}>-8 vitality</Text>
             </View>
           </View>
           <View style={s.formulaRow}>
-            <Text style={s.formulaEmoji}>🔥</Text>
+            <StreakIcon size={18} />
             <View style={s.formulaText}>
               <Text style={s.formulaLabel}>7-day streak bonus</Text>
               <Text style={s.formulaValue}>+15 vitality</Text>
             </View>
           </View>
           <View style={s.formulaRow}>
-            <Text style={s.formulaEmoji}>⭐</Text>
+            <StarIcon size={18} />
             <View style={s.formulaText}>
               <Text style={s.formulaLabel}>Exceed goal by 20%+</Text>
               <Text style={s.formulaValue}>+5 extra vitality</Text>
@@ -137,6 +146,11 @@ function makeStyles(colors: ReturnType<typeof useTheme>['colors']) {
   return StyleSheet.create({
     root: { flex: 1 },
     scroll: { padding: 16, paddingTop: 52, gap: 14 },
+    titleRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 8,
+    },
     screenTitle: {
       color: colors.parchment,
       fontSize: 24,
@@ -161,9 +175,8 @@ function makeStyles(colors: ReturnType<typeof useTheme>['colors']) {
       borderColor: colors.border,
     },
     overallLeft: {
-      flexDirection: 'row',
-      alignItems: 'flex-end',
-      gap: 2,
+      flex: 1,
+      gap: 6,
     },
     overallScore: {
       color: colors.healthFull,
@@ -179,8 +192,9 @@ function makeStyles(colors: ReturnType<typeof useTheme>['colors']) {
       marginBottom: 8,
     },
     overallRight: {
-      flex: 1,
-      gap: 6,
+      flexDirection: 'row',
+      alignItems: 'flex-end',
+      gap: 2,
     },
     overallTitle: {
       color: colors.parchment,
@@ -255,7 +269,6 @@ function makeStyles(colors: ReturnType<typeof useTheme>['colors']) {
       alignItems: 'center',
       gap: 10,
     },
-    formulaEmoji: { fontSize: 18 },
     formulaText: {
       flex: 1,
       flexDirection: 'row',
@@ -285,7 +298,11 @@ function makeStyles(colors: ReturnType<typeof useTheme>['colors']) {
       alignItems: 'center',
       gap: 10,
     },
-    ailmentEmoji: { fontSize: 20 },
+    ailmentIconWrap: {
+      width: 24,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
     ailmentInfo: { flex: 1 },
     ailmentName: {
       color: colors.parchment,

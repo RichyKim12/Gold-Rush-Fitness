@@ -17,7 +17,7 @@ import HealthBar from '../../components/HealthBar';
 import StepRing from '../../components/StepRing';
 import WeekHeatmap from '../../components/WeekHeatmap';
 import { useRouter } from 'expo-router';
-
+import { TrailIcon, StreakIcon, PinIcon, TrophyIcon } from '../../components/PixelIcons';
 
 export default function HomeScreen() {
   const router = useRouter();
@@ -44,13 +44,19 @@ export default function HomeScreen() {
         {/* Header */}
         <View style={s.header}>
           <View>
-            <Text style={s.eyebrow}>🪵 Day 39 on the Trail</Text>
+            <View style={s.eyebrowRow}>
+              <TrailIcon size={14} />
+              <Text style={s.eyebrow}>Day 39 on the Trail</Text>
+            </View>
             <Text style={s.title}>
               {state.playerName}'s{'\n'}Wagon Party
             </Text>
           </View>
           <View style={s.headerRight}>
-            <Text style={s.streakBadge}>🔥 {state.currentStreak}</Text>
+            <View style={s.streakRow}>
+              <StreakIcon size={22} />
+              <Text style={s.streakBadge}>{state.currentStreak}</Text>
+            </View>
             <Text style={s.streakLabel}>day streak</Text>
           </View>
         </View>
@@ -79,9 +85,10 @@ export default function HomeScreen() {
             <View style={s.locationDivider} />
             <View style={s.locationItem}>
               <Text style={s.locationLabel}>Miles</Text>
-              <Text style={s.locationValue}>
-                📍 {state.trailMiles.toLocaleString()}
-              </Text>
+              <View style={s.milesRow}>
+                <PinIcon size={12} />
+                <Text style={s.locationValue}>{state.trailMiles.toLocaleString()}</Text>
+              </View>
             </View>
           </View>
         </View>
@@ -143,22 +150,16 @@ export default function HomeScreen() {
           onPress={() => router.push('/rewards')}
         >
           <View style={s.rewardsLeft}>
-            <Text style={s.rewardsTitle}>🏆 Rewards & Badges</Text>
+            <View style={s.rewardsTitleRow}>
+              <TrophyIcon size={16} />
+              <Text style={s.rewardsTitle}>Rewards & Badges</Text>
+            </View>
             <Text style={s.rewardsSub}>
               {state.unlockedRewards.length} unlocked · Keep marching!
             </Text>
           </View>
           <Text style={s.rewardsArrow}>→</Text>
         </TouchableOpacity>
-
-        {/* DAILY TIP */}
-        <View style={s.tipBox}>
-          <Text style={s.tipIcon}>📜</Text>
-          <Text style={s.tipText}>
-            "A pioneer in good health can cover 15–20 miles a day. Your{' '}
-            {10000..toLocaleString()} daily steps keep the party strong!"
-          </Text>
-        </View>
       </ScrollView>
     </LinearGradient>
   );
@@ -174,20 +175,23 @@ function makeStyles(colors: ReturnType<typeof useTheme>['colors']) {
       alignItems: 'flex-start',
       marginBottom: 4,
     },
+    eyebrowRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 6,
+      marginBottom: 4,
+    },
     eyebrow: {
       color: colors.trailGold,
-      // fontFamily: 'monospace',
       fontSize: 11,
       textTransform: 'uppercase',
       letterSpacing: 2,
-      marginBottom: 4,
     },
     title: {
       color: colors.parchment,
       fontSize: 26,
       fontWeight: 'bold',
       lineHeight: 30,
-      // fontFamily: 'serif',
     },
     headerRight: {
       alignItems: 'center',
@@ -197,10 +201,18 @@ function makeStyles(colors: ReturnType<typeof useTheme>['colors']) {
       borderWidth: 1,
       borderColor: colors.border,
     },
-    streakBadge: { fontSize: 24, color: colors.parchment, },
+    streakRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 4,
+    },
+    streakBadge: {
+      fontSize: 20,
+      fontWeight: 'bold',
+      color: colors.parchment,
+    },
     streakLabel: {
       color: colors.parchmentDark,
-      // fontFamily: 'monospace',
       fontSize: 9,
       textTransform: 'uppercase',
     },
@@ -225,7 +237,6 @@ function makeStyles(colors: ReturnType<typeof useTheme>['colors']) {
     },
     locationLabel: {
       color: colors.dirtLight,
-      // fontFamily: 'monospace',
       fontSize: 9,
       textTransform: 'uppercase',
       letterSpacing: 1,
@@ -233,10 +244,14 @@ function makeStyles(colors: ReturnType<typeof useTheme>['colors']) {
     },
     locationValue: {
       color: colors.parchment,
-      // fontFamily: 'monospace',
       fontSize: 10,
       fontWeight: 'bold',
       textAlign: 'center',
+    },
+    milesRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 3,
     },
     statusStrip: {
       flexDirection: 'row',
@@ -256,19 +271,16 @@ function makeStyles(colors: ReturnType<typeof useTheme>['colors']) {
     statusIcon: { fontSize: 18, marginBottom: 2 },
     statusLabel: {
       color: colors.dirtLight,
-      // fontFamily: 'monospace',
       fontSize: 9,
       textTransform: 'uppercase',
     },
     statusValue: {
       color: colors.parchment,
-      // fontFamily: 'monospace',
       fontSize: 10,
       fontWeight: 'bold',
       marginTop: 2,
     },
     statsRow: { flexDirection: 'row', gap: 10 },
-
     stepsCard: {
       flex: 1,
       backgroundColor: colors.bgCard,
@@ -277,7 +289,7 @@ function makeStyles(colors: ReturnType<typeof useTheme>['colors']) {
       borderWidth: 1,
       borderColor: colors.border,
       gap: 8,
-      justifyContent: 'space-between',  // ← pushes button to bottom
+      justifyContent: 'space-between',
     },
     healthCard: {
       flex: 1.4,
@@ -290,7 +302,6 @@ function makeStyles(colors: ReturnType<typeof useTheme>['colors']) {
     },
     cardTitle: {
       color: colors.trailGold,
-      // fontFamily: 'monospace',
       fontSize: 9,
       textTransform: 'uppercase',
       letterSpacing: 2,
@@ -307,7 +318,6 @@ function makeStyles(colors: ReturnType<typeof useTheme>['colors']) {
     },
     logButtonText: {
       color: colors.trailGold,
-      // fontFamily: 'monospace',
       fontSize: 10,
     },
     rewardsPreview: {
@@ -320,15 +330,18 @@ function makeStyles(colors: ReturnType<typeof useTheme>['colors']) {
       borderColor: colors.border,
     },
     rewardsLeft: { flex: 1 },
+    rewardsTitleRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 6,
+    },
     rewardsTitle: {
       color: colors.parchment,
-      // fontFamily: 'monospace',
       fontSize: 14,
       fontWeight: 'bold',
     },
     rewardsSub: {
       color: colors.dirtLight,
-      // fontFamily: 'monospace',
       fontSize: 10,
       marginTop: 3,
     },
@@ -346,7 +359,6 @@ function makeStyles(colors: ReturnType<typeof useTheme>['colors']) {
     tipIcon: { fontSize: 18 },
     tipText: {
       color: colors.parchmentDark,
-      // fontFamily: 'monospace',
       fontSize: 11,
       flex: 1,
       lineHeight: 16,

@@ -2,12 +2,23 @@
 import { Tabs } from 'expo-router';
 import { View, Text, StyleSheet } from 'react-native';
 import { Colors } from '../../constants/theme';
+import { TrailIcon, StepsIcon, HealthIcon, TrophyIcon } from '../../components/PixelIcons';
 
-function TabIcon({ emoji, label, focused }: { emoji: string; label: string; focused: boolean }) {
+function TabIcon({
+  Icon,
+  label,
+  focused,
+}: {
+  Icon: React.ComponentType<{ focused: boolean }>;
+  label: string;
+  focused: boolean;
+}) {
   return (
-    <View style={[styles.tabIcon, focused && styles.tabIconFocused]}>
-      <Text style={styles.tabEmoji}>{emoji}</Text>
-      <Text style={[styles.tabLabel, focused && styles.tabLabelFocused]}>{label}</Text>
+    <View style={styles.tabIcon}>
+      <Icon focused={focused} />
+      <Text style={[styles.tabLabel, focused && styles.tabLabelFocused]}>
+        {label}
+      </Text>
     </View>
   );
 }
@@ -32,7 +43,7 @@ export default function TabLayout() {
         name="index"
         options={{
           tabBarIcon: ({ focused }) => (
-            <TabIcon emoji="🪵" label="Trail" focused={focused} />
+            <TabIcon Icon={TrailIcon} label="Trail" focused={focused} />
           ),
         }}
       />
@@ -40,7 +51,7 @@ export default function TabLayout() {
         name="steps"
         options={{
           tabBarIcon: ({ focused }) => (
-            <TabIcon emoji="👢" label="Steps" focused={focused} />
+            <TabIcon Icon={StepsIcon} label="Steps" focused={focused} />
           ),
         }}
       />
@@ -48,7 +59,7 @@ export default function TabLayout() {
         name="health"
         options={{
           tabBarIcon: ({ focused }) => (
-            <TabIcon emoji="❤️" label="Health" focused={focused} />
+            <TabIcon Icon={HealthIcon} label="Health" focused={focused} />
           ),
         }}
       />
@@ -56,7 +67,7 @@ export default function TabLayout() {
         name="rewards"
         options={{
           tabBarIcon: ({ focused }) => (
-            <TabIcon emoji="🏆" label="Rewards" focused={focused} />
+            <TabIcon Icon={TrophyIcon} label="Rewards" focused={focused} />
           ),
         }}
       />
@@ -69,11 +80,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     paddingTop: 4,
-    gap: 2,
-  },
-  tabIconFocused: {},
-  tabEmoji: {
-    fontSize: 22,
+    gap: 3,
   },
   tabLabel: {
     color: Colors.dirtLight,
