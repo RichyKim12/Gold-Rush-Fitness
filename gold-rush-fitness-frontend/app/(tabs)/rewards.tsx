@@ -37,6 +37,13 @@ export default function RewardsScreen() {
     });
   };
 
+  // ✅ useEffect moved above early return
+  useEffect(() => {
+    if (isLoading || error) return;
+    const timer = setTimeout(() => scrollToWagon(false), 100);
+    return () => clearTimeout(timer);
+  }, [isLoading, error]);
+
   if (isLoading || error) {
     return (
       <LinearGradient
@@ -53,11 +60,6 @@ export default function RewardsScreen() {
     if (filter === 'locked') return !state.unlockedRewards.includes(r.id);
     return true;
   });
-
-  useEffect(() => {
-    const timer = setTimeout(() => scrollToWagon(false), 100);
-    return () => clearTimeout(timer);
-  }, []);
 
   const s = makeStyles(colors);
 
@@ -172,7 +174,7 @@ export default function RewardsScreen() {
                   );
                 })}
 
-                {/* Wagon marker — coin icon instead of emoji */}
+                {/* Wagon marker */}
                 <View style={[s.wagonMarker, { left: wagonX - 14 }]}>
                   <CoinIcon size={28} />
                   <View style={[s.wagonNeedle, { backgroundColor: colors.trailGold }]} />
