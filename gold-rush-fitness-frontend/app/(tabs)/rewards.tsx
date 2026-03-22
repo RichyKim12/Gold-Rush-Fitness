@@ -470,7 +470,7 @@ function makeStyles(colors: ReturnType<typeof useTheme>['colors']) {
     },
     milestoneEmoji: {
       fontSize: 28,
-      marginTop: 20,
+      marginTop: 10,
     },
     milestoneName: {
       fontFamily: 'monospace',
@@ -549,7 +549,9 @@ function makeStyles(colors: ReturnType<typeof useTheme>['colors']) {
       gap: 10,
     },
     badgeCard: {
-      width: '47%',
+      flexBasis: '47%',
+      flexGrow: 1,
+      flexShrink: 1,
       backgroundColor: colors.bgCard,
       borderRadius: 10,
       padding: 12,
@@ -557,6 +559,8 @@ function makeStyles(colors: ReturnType<typeof useTheme>['colors']) {
       borderWidth: 1,
       borderColor: colors.border,
       alignItems: 'center',
+      minHeight: 200,
+      justifyContent: 'space-between',
     },
     badgeIconWrap: {
       width: 56,
