@@ -1,5 +1,5 @@
 // app/(tabs)/rewards.tsx — Rewards & Achievements Screen
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   View,
   Text,
@@ -14,10 +14,15 @@ import { MOCK_STATE } from '../../constants/mockData';
 
 type Filter = 'all' | 'unlocked' | 'locked';
 
+// Total width of the scrollable trail map in pixels
+const TRAIL_MAP_WIDTH = 1400;
+const TRAIL_MAP_HEIGHT = 100;
+
 export default function RewardsScreen() {
   const { colors } = useTheme();
   const state = MOCK_STATE;
   const [filter, setFilter] = useState<Filter>('all');
+  const trailScrollRef = useRef<ScrollView>(null);
 
   const filtered = REWARDS.filter((r) => {
     if (filter === 'unlocked') return state.unlockedRewards.includes(r.id);
@@ -26,6 +31,18 @@ export default function RewardsScreen() {
   });
 
   const progressPercent = (state.trailMiles / TRAIL_TOTAL_MILES) * 100;
+  const wagonX = (progressPercent / 100) * TRAIL_MAP_WIDTH;
+
+  // Auto-scroll to keep wagon centered
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      trailScrollRef.current?.scrollTo({
+        x: Math.max(0, wagonX - 140),
+        animated: true,
+      });
+    }, 400);
+    return () => clearTimeout(timer);
+  }, [wagonX]);
 
   const s = makeStyles(colors);
 
@@ -58,43 +75,84 @@ export default function RewardsScreen() {
           </View>
         </View>
 
-        {/* Trail progress map */}
+        {/* Trail progress map — horizontal scroller */}
         <View style={s.trailCard}>
           <Text style={s.cardTitle}>TRAIL PROGRESS MAP</Text>
-          <View style={s.trailMap}>
-            <View style={s.trailLine} />
-            <View style={[s.trailLineFill, { width: `${progressPercent}%` }]} />
-
-            {MILESTONES.map((m, i) => {
-              const pct = (m.mile / TRAIL_TOTAL_MILES) * 100;
-              const passed = state.trailMiles >= m.mile;
-              return (
-                <View key={i} style={[s.milestoneDot, { left: `${pct}%` }]}>
-                  <Text style={[s.milestoneEmoji, { opacity: passed ? 1 : 0.35 }]}>
-                    {m.emoji}
-                  </Text>
-                  {i % 2 === 0 ? (
-                    <Text style={[s.milestoneName, s.milestoneAbove, { opacity: passed ? 1 : 0.4 }]}>
-                      {m.name.split(',')[0]}
-                    </Text>
-                  ) : (
-                    <Text style={[s.milestoneName, s.milestoneBelow, { opacity: passed ? 1 : 0.4 }]}>
-                      {m.name.split(',')[0]}
-                    </Text>
-                  )}
-                </View>
-              );
-            })}
-
-            <View style={[s.wagonMarker, { left: `${progressPercent}%` }]}>
-              <Text style={s.wagonEmoji}>🪙</Text>
-            </View>
-          </View>
-
           <Text style={s.trailStats}>
             {state.trailMiles.toLocaleString()} / {TRAIL_TOTAL_MILES.toLocaleString()} miles
             ({progressPercent.toFixed(1)}%)
           </Text>
+
+          {/* Fade-edge wrapper */}
+          <View style={s.trailScrollWrapper}>
+            <ScrollView
+              ref={trailScrollRef}
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              style={s.trailScroll}
+              contentContainerStyle={{ width: TRAIL_MAP_WIDTH }}
+            >
+              {/* Fixed-height canvas */}
+              <View style={{ width: TRAIL_MAP_WIDTH, height: TRAIL_MAP_HEIGHT + 40 }}>
+
+                {/* Base trail line */}
+                <View style={[s.trailLine, { width: TRAIL_MAP_WIDTH }]} />
+
+                {/* Progress fill */}
+                <View style={[s.trailLineFill, { width: wagonX }]} />
+
+                {/* Milestones */}
+                {MILESTONES.map((m, i) => {
+                  const x = (m.mile / TRAIL_TOTAL_MILES) * TRAIL_MAP_WIDTH;
+                  const passed = state.trailMiles >= m.mile;
+                  const above = i % 2 === 0;
+                  return (
+                    <View
+                      key={i}
+                      style={[s.milestoneDot, { left: x - 12 }]}
+                    >
+                      {above && (
+                        <Text style={[s.milestoneName, s.milestoneAbove, { opacity: passed ? 1 : 0.4 }]}>
+                          {m.name.split(',')[0]}
+                        </Text>
+                      )}
+                      <Text style={[s.milestoneEmoji, { opacity: passed ? 1 : 0.35 }]}>
+                        {m.emoji}
+                      </Text>
+                      {!above && (
+                        <Text style={[s.milestoneName, s.milestoneBelow, { opacity: passed ? 1 : 0.4 }]}>
+                          {m.name.split(',')[0]}
+                        </Text>
+                      )}
+                    </View>
+                  );
+                })}
+
+                {/* Wagon marker */}
+                <View style={[s.wagonMarker, { left: wagonX - 12 }]}>
+                  <Text style={s.wagonEmoji}>🪙</Text>
+                </View>
+
+              </View>
+            </ScrollView>
+
+            {/* Left fade overlay */}
+            <LinearGradient
+              colors={[colors.bgCard, `${colors.bgCard}00`]}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 0 }}
+              style={s.fadeLeft}
+              pointerEvents="none"
+            />
+            {/* Right fade overlay */}
+            <LinearGradient
+              colors={[`${colors.bgCard}00`, colors.bgCard]}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 0 }}
+              style={s.fadeRight}
+              pointerEvents="none"
+            />
+          </View>
         </View>
 
         {/* Filter tabs */}
@@ -257,7 +315,7 @@ function makeStyles(colors: ReturnType<typeof useTheme>['colors']) {
       backgroundColor: colors.bgCard,
       borderRadius: 10,
       padding: 14,
-      gap: 14,
+      gap: 10,
       borderWidth: 1,
       borderColor: colors.border,
     },
@@ -268,57 +326,78 @@ function makeStyles(colors: ReturnType<typeof useTheme>['colors']) {
       textTransform: 'uppercase',
       letterSpacing: 2,
     },
-    trailMap: {
-      height: 80,
-      position: 'relative',
-      marginHorizontal: 10,
-      marginVertical: 20,
-    },
-    trailLine: {
-      position: 'absolute',
-      top: 30,
-      left: 0,
-      right: 0,
-      height: 4,
-      backgroundColor: colors.dirtDark,
-      borderRadius: 2,
-    },
-    trailLineFill: {
-      position: 'absolute',
-      top: 30,
-      left: 0,
-      height: 4,
-      backgroundColor: colors.trailGold,
-      borderRadius: 2,
-    },
-    milestoneDot: {
-      position: 'absolute',
-      top: 22,
-      alignItems: 'center',
-      transform: [{ translateX: -10 }],
-    },
-    milestoneEmoji: { fontSize: 16 },
-    milestoneName: {
-      color: colors.parchmentDark,
-      fontFamily: 'monospace',
-      fontSize: 6,
-      position: 'absolute',
-      width: 50,
-      textAlign: 'center',
-    },
-    milestoneAbove: { bottom: 36 },
-    milestoneBelow: { top: 24 },
-    wagonMarker: {
-      position: 'absolute',
-      top: 14,
-      transform: [{ translateX: -10 }],
-    },
-    wagonEmoji: { fontSize: 18 },
     trailStats: {
       color: colors.dirtLight,
       fontFamily: 'monospace',
       fontSize: 10,
+    },
+    trailScrollWrapper: {
+      position: 'relative',
+      height: TRAIL_MAP_HEIGHT + 40,
+    },
+    trailScroll: {
+      flex: 1,
+    },
+    trailLine: {
+      position: 'absolute',
+      top: TRAIL_MAP_HEIGHT / 2,
+      left: 0,
+      height: 5,
+      backgroundColor: colors.dirtDark,
+      borderRadius: 3,
+    },
+    trailLineFill: {
+      position: 'absolute',
+      top: TRAIL_MAP_HEIGHT / 2,
+      left: 0,
+      height: 5,
+      backgroundColor: colors.trailGold,
+      borderRadius: 3,
+    },
+    milestoneDot: {
+      position: 'absolute',
+      top: TRAIL_MAP_HEIGHT / 2 - 12,
+      alignItems: 'center',
+      width: 24,
+    },
+    milestoneEmoji: {
+      fontSize: 20,
+    },
+    milestoneName: {
+      color: colors.parchmentDark,
+      fontFamily: 'monospace',
+      fontSize: 7,
+      width: 52,
       textAlign: 'center',
+    },
+    milestoneAbove: {
+      marginBottom: 2,
+    },
+    milestoneBelow: {
+      marginTop: 2,
+    },
+    wagonMarker: {
+      position: 'absolute',
+      top: TRAIL_MAP_HEIGHT / 2 - 28,
+      width: 24,
+      alignItems: 'center',
+    },
+    wagonEmoji: {
+      fontSize: 22,
+    },
+    fadeLeft: {
+      position: 'absolute',
+      left: 0,
+      top: 0,
+      bottom: 0,
+      width: 28,
+    },
+    fadeRight: {
+      position: 'absolute',
+      right: 0,
+      top: 0,
+      bottom: 0,
+      width: 28,
     },
     filterRow: {
       flexDirection: 'row',

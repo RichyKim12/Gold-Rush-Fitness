@@ -161,117 +161,117 @@ export default function WagonScene({ progressPercent, milesFromNext, nextMilesto
         {/* ── OXEN (left pair) ── */}
         <G>
           {/* Ox body */}
-          <PixelRow x={8}  y={28} count={8} color={C.oxWhite} />
-          <PixelRow x={7}  y={29} count={10} color={C.oxWhite} />
-          <PixelRow x={7}  y={30} count={10} color={C.oxWhite} />
-          <PixelRow x={8}  y={31} count={8} color={C.oxWhite} />
+          <PixelRow x={23}  y={28} count={8} color={C.oxWhite} />
+          <PixelRow x={22}  y={29} count={10} color={C.oxWhite} />
+          <PixelRow x={22}  y={30} count={10} color={C.oxWhite} />
+          <PixelRow x={23}  y={31} count={8} color={C.oxWhite} />
           {/* Head */}
-          <PixelRow x={5}  y={28} count={4} color={C.oxWhite} />
-          <PixelRow x={5}  y={29} count={4} color={C.oxWhite} />
+          <PixelRow x={20}  y={28} count={4} color={C.oxWhite} />
+          <PixelRow x={20}  y={29} count={4} color={C.oxWhite} />
           {/* Horns */}
-          <Pixel x={5}  y={27} color={C.oxGray} />
-          <Pixel x={7}  y={26} color={C.oxGray} />
+          <Pixel x={20}  y={27} color={C.oxGray} />
+          <Pixel x={22}  y={26} color={C.oxGray} />
           {/* Eye */}
-          <Pixel x={5}  y={28} color={C.black} />
+          <Pixel x={20}  y={28} color={C.black} />
           {/* Legs */}
-          <Pixel x={9}  y={32} color={C.oxGray} />
-          <Pixel x={9}  y={33} color={C.oxGray} />
-          <Pixel x={11} y={32} color={C.oxGray} />
-          <Pixel x={11} y={33} color={C.oxGray} />
-          <Pixel x={13} y={32} color={C.oxGray} />
-          <Pixel x={13} y={33} color={C.oxGray} />
-          <Pixel x={15} y={32} color={C.oxGray} />
-          <Pixel x={15} y={33} color={C.oxGray} />
+          <Pixel x={24}  y={32} color={C.oxGray} />
+          <Pixel x={24}  y={33} color={C.oxGray} />
+          <Pixel x={26} y={32} color={C.oxGray} />
+          <Pixel x={26} y={33} color={C.oxGray} />
+          <Pixel x={28} y={32} color={C.oxGray} />
+          <Pixel x={28} y={33} color={C.oxGray} />
+          <Pixel x={30} y={32} color={C.oxGray} />
+          <Pixel x={30} y={33} color={C.oxGray} />
         </G>
 
         {/* ── YOKE / TONGUE ── */}
-        <PixelRow x={17} y={30} count={6} color={C.woodBrown} />
+        <PixelRow x={32} y={30} count={6} color={C.woodBrown} />
 
         {/* ── WAGON BOX ── */}
         <G>
           {/* Main box */}
-          <PixelRow x={23} y={27} count={18} color={C.woodBrown} />
-          <PixelRow x={23} y={28} count={18} color={C.woodBrown} />
-          <PixelRow x={23} y={29} count={18} color={C.woodBrown} />
-          <PixelRow x={23} y={30} count={18} color={C.woodBrown} />
-          <PixelRow x={23} y={31} count={18} color={C.woodBrown} />
+          <PixelRow x={38} y={27} count={18} color={C.woodBrown} />
+          <PixelRow x={38} y={28} count={18} color={C.woodBrown} />
+          <PixelRow x={38} y={29} count={18} color={C.woodBrown} />
+          <PixelRow x={38} y={30} count={18} color={C.woodBrown} />
+          <PixelRow x={38} y={31} count={18} color={C.woodBrown} />
           {/* Plank lines */}
-          <Pixel x={27} y={27} color={C.dirtDark} />
-          <Pixel x={27} y={28} color={C.dirtDark} />
-          <Pixel x={27} y={29} color={C.dirtDark} />
-          <Pixel x={27} y={30} color={C.dirtDark} />
-          <Pixel x={31} y={27} color={C.dirtDark} />
-          <Pixel x={31} y={28} color={C.dirtDark} />
-          <Pixel x={31} y={29} color={C.dirtDark} />
-          <Pixel x={31} y={30} color={C.dirtDark} />
-          <Pixel x={35} y={27} color={C.dirtDark} />
-          <Pixel x={35} y={28} color={C.dirtDark} />
-          <Pixel x={35} y={29} color={C.dirtDark} />
-          <Pixel x={35} y={30} color={C.dirtDark} />
+          <Pixel x={42} y={27} color={C.dirtDark} />
+          <Pixel x={42} y={28} color={C.dirtDark} />
+          <Pixel x={42} y={29} color={C.dirtDark} />
+          <Pixel x={42} y={30} color={C.dirtDark} />
+          <Pixel x={46} y={27} color={C.dirtDark} />
+          <Pixel x={46} y={28} color={C.dirtDark} />
+          <Pixel x={46} y={29} color={C.dirtDark} />
+          <Pixel x={46} y={30} color={C.dirtDark} />
+          <Pixel x={50} y={27} color={C.dirtDark} />
+          <Pixel x={50} y={28} color={C.dirtDark} />
+          <Pixel x={50} y={29} color={C.dirtDark} />
+          <Pixel x={50} y={30} color={C.dirtDark} />
           {/* Top rail */}
-          <PixelRow x={23} y={26} count={18} color={C.dirtDark} />
+          <PixelRow x={38} y={26} count={18} color={C.dirtDark} />
           {/* Bottom rail */}
-          <PixelRow x={23} y={32} count={18} color={C.dirtDark} />
+          <PixelRow x={38} y={32} count={18} color={C.dirtDark} />
         </G>
 
         {/* ── CANVAS COVER ── */}
         <G>
-          <PixelRow x={24} y={22} count={16} color={C.wagonCream} />
-          <PixelRow x={23} y={23} count={18} color={C.wagonCream} />
-          <PixelRow x={23} y={24} count={18} color={C.wagonCream} />
-          <PixelRow x={23} y={25} count={18} color={C.wagonCream} />
-          <PixelRow x={24} y={21} count={14} color={C.wagonCream} />
-          <PixelRow x={26} y={20} count={10} color={C.wagonCream} />
-          <PixelRow x={28} y={19} count={6} color={C.wagonCream} />
+          <PixelRow x={39} y={22} count={16} color={C.wagonCream} />
+          <PixelRow x={38} y={23} count={18} color={C.wagonCream} />
+          <PixelRow x={38} y={24} count={18} color={C.wagonCream} />
+          <PixelRow x={38} y={25} count={18} color={C.wagonCream} />
+          <PixelRow x={39} y={21} count={14} color={C.wagonCream} />
+          <PixelRow x={41} y={20} count={10} color={C.wagonCream} />
+          <PixelRow x={43} y={19} count={6} color={C.wagonCream} />
           {/* Canvas ribs (darker lines) */}
-          <Pixel x={26} y={20} color={C.offWhite} />
-          <Pixel x={26} y={21} color={C.offWhite} />
-          <Pixel x={31} y={19} color={C.offWhite} />
-          <Pixel x={31} y={20} color={C.offWhite} />
-          <Pixel x={31} y={21} color={C.offWhite} />
-          <Pixel x={36} y={20} color={C.offWhite} />
-          <Pixel x={36} y={21} color={C.offWhite} />
+          <Pixel x={41} y={20} color={C.offWhite} />
+          <Pixel x={41} y={21} color={C.offWhite} />
+          <Pixel x={46} y={19} color={C.offWhite} />
+          <Pixel x={46} y={20} color={C.offWhite} />
+          <Pixel x={46} y={21} color={C.offWhite} />
+          <Pixel x={51} y={20} color={C.offWhite} />
+          <Pixel x={51} y={21} color={C.offWhite} />
         </G>
 
         {/* ── FRONT WHEEL ── */}
         <G>
           {/* Outer ring */}
-          <PixelRow x={24} y={32} count={4} color={C.wheelDark} />
-          <PixelRow x={23} y={33} count={6} color={C.wheelDark} />
-          <PixelRow x={23} y={34} count={6} color={C.wheelDark} />
-          <PixelRow x={23} y={35} count={6} color={C.wheelDark} />
-          <PixelRow x={24} y={36} count={4} color={C.wheelDark} />
+          <PixelRow x={39} y={32} count={4} color={C.wheelDark} />
+          <PixelRow x={38} y={33} count={6} color={C.wheelDark} />
+          <PixelRow x={38} y={34} count={6} color={C.wheelDark} />
+          <PixelRow x={38} y={35} count={6} color={C.wheelDark} />
+          <PixelRow x={39} y={36} count={4} color={C.wheelDark} />
           {/* Hub */}
-          <Pixel x={25} y={34} color={C.dirtBrown} />
-          <Pixel x={26} y={34} color={C.dirtBrown} />
+          <Pixel x={40} y={34} color={C.dirtBrown} />
+          <Pixel x={41} y={34} color={C.dirtBrown} />
           {/* Spokes */}
-          <Pixel x={26} y={33} color={C.woodBrown} />
-          <Pixel x={26} y={35} color={C.woodBrown} />
-          <Pixel x={24} y={34} color={C.woodBrown} />
-          <Pixel x={28} y={34} color={C.woodBrown} />
+          <Pixel x={41} y={33} color={C.woodBrown} />
+          <Pixel x={41} y={35} color={C.woodBrown} />
+          <Pixel x={39} y={34} color={C.woodBrown} />
+          <Pixel x={43} y={34} color={C.woodBrown} />
         </G>
 
         {/* ── REAR WHEEL (bigger) ── */}
         <G>
           {/* Outer ring */}
-          <PixelRow x={35} y={31} count={6} color={C.wheelDark} />
-          <PixelRow x={33} y={32} count={10} color={C.wheelDark} />
-          <PixelRow x={33} y={33} count={10} color={C.wheelDark} />
-          <PixelRow x={33} y={34} count={10} color={C.wheelDark} />
-          <PixelRow x={33} y={35} count={10} color={C.wheelDark} />
-          <PixelRow x={33} y={36} count={10} color={C.wheelDark} />
-          <PixelRow x={35} y={37} count={6} color={C.wheelDark} />
+          <PixelRow x={50} y={31} count={6} color={C.wheelDark} />
+          <PixelRow x={48} y={32} count={10} color={C.wheelDark} />
+          <PixelRow x={48} y={33} count={10} color={C.wheelDark} />
+          <PixelRow x={48} y={34} count={10} color={C.wheelDark} />
+          <PixelRow x={48} y={35} count={10} color={C.wheelDark} />
+          <PixelRow x={48} y={36} count={10} color={C.wheelDark} />
+          <PixelRow x={50} y={37} count={6} color={C.wheelDark} />
           {/* Hub */}
-          <PixelRow x={36} y={34} count={4} color={C.dirtBrown} />
+          <PixelRow x={51} y={34} count={4} color={C.dirtBrown} />
           {/* Spokes */}
-          <Pixel x={38} y={32} color={C.woodBrown} />
-          <Pixel x={38} y={33} color={C.woodBrown} />
-          <Pixel x={38} y={35} color={C.woodBrown} />
-          <Pixel x={38} y={36} color={C.woodBrown} />
-          <Pixel x={34} y={34} color={C.woodBrown} />
-          <Pixel x={35} y={34} color={C.woodBrown} />
-          <Pixel x={40} y={34} color={C.woodBrown} />
-          <Pixel x={41} y={34} color={C.woodBrown} />
+          <Pixel x={53} y={32} color={C.woodBrown} />
+          <Pixel x={53} y={33} color={C.woodBrown} />
+          <Pixel x={53} y={35} color={C.woodBrown} />
+          <Pixel x={53} y={36} color={C.woodBrown} />
+          <Pixel x={49} y={34} color={C.woodBrown} />
+          <Pixel x={50} y={34} color={C.woodBrown} />
+          <Pixel x={55} y={34} color={C.woodBrown} />
+          <Pixel x={56} y={34} color={C.woodBrown} />
         </G>
 
         {/* ── DESTINATION FLAG (right) ── */}
@@ -336,4 +336,4 @@ const styles = StyleSheet.create({
     textTransform: 'uppercase',
     letterSpacing: 1,
   },
-});
+}); 
