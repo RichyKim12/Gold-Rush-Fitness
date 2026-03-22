@@ -10,11 +10,18 @@
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": false,
-      "bundleIdentifier": "com.oregontrailfitness",
+      "bundleIdentifier": "com.terrance.oregontrailfitness",
       "infoPlist": {
         "NSMotionUsageDescription": "We use motion data to count your steps on the trail.",
         "NSHealthShareUsageDescription": "We use health data to track your wellness journey.",
-        "NSHealthUpdateUsageDescription": "We update health data to record your trail progress."
+        "NSHealthUpdateUsageDescription": "We update health data to record your trail progress.",
+        "NSAppTransportSecurity": {
+          "NSAllowsArbitraryLoads": true
+        }
+      },
+      "entitlements": {
+        "com.apple.developer.healthkit": true,
+        "com.apple.developer.healthkit.background-delivery": true
       }
     },
     "android": {
@@ -24,9 +31,11 @@
         "backgroundImage": "./assets/images/android-icon-background.png",
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
-      "package": "com.oregontrailfitness",
+      "package": "com.terrance.oregontrailfitness",
       "permissions": [
-        "ACTIVITY_RECOGNITION"
+        "ACTIVITY_RECOGNITION",
+        "android.permission.HEALTH_READ",
+        "android.permission.HEALTH_WRITE"
       ],
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false
@@ -49,11 +58,18 @@
           }
         }
       ],
-      "expo-font"
+      "expo-font",
+      [
+        "@kingstinct/react-native-healthkit",
+        {
+          "NSHealthShareUsageDescription": "We use health data to track your wellness journey.",
+          "NSHealthUpdateUsageDescription": false,
+          "background": true
+        }
+      ]
     ],
     "experiments": {
-      "typedRoutes": true,
-      "reactCompiler": true
+      "typedRoutes": true
     }
   }
 }

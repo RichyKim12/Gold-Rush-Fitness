@@ -17,9 +17,13 @@ import HealthBar from '../../components/HealthBar';
 import StepRing from '../../components/StepRing';
 import WeekHeatmap from '../../components/WeekHeatmap';
 import { useRouter } from 'expo-router';
-
+import useHealthData from "../../hooks/useHealthData";
 
 export default function HomeScreen() {
+  const date = new Date();
+  // Destructure the LIVE steps from our hook
+  const { steps, error } = useHealthData(date);
+  
   const router = useRouter();
   const { colors } = useTheme();
   const { state, isLoading, error } = useAppData();
@@ -60,6 +64,7 @@ export default function HomeScreen() {
             <Text style={s.title}>
               {state.playerName}'s{'\n'}Wagon Party
             </Text>
+            {error && <Text style={{color: 'red', fontSize: 10, marginTop: 5}}>{error}</Text>}
           </View>
           <View style={s.headerRight}>
             <Text style={s.streakBadge}>🔥 {state.currentStreak}</Text>
@@ -122,7 +127,8 @@ export default function HomeScreen() {
           <View style={s.stepsCard}>
             <Text style={s.cardTitle}>TODAY'S MARCH</Text>
             <View style={{ alignItems: 'center' }}>
-              <StepRing steps={state.todaySteps} />
+              {/* Pass the LIVE steps from hook into the Ring */}
+              <StepRing steps={steps} /> 
             </View>
             <TouchableOpacity
               style={[s.logButton, { alignSelf: 'flex-end' }]}
@@ -176,7 +182,7 @@ export default function HomeScreen() {
   );
 }
 
-function makeStyles(colors: ReturnType<typeof useTheme>['colors']) {
+function makeStyles(colors: any) {
   return StyleSheet.create({
     root: { flex: 1 },
     scroll: { padding: 16, paddingTop: 52, gap: 12 },
@@ -188,7 +194,6 @@ function makeStyles(colors: ReturnType<typeof useTheme>['colors']) {
     },
     eyebrow: {
       color: colors.trailGold,
-      // fontFamily: 'monospace',
       fontSize: 11,
       textTransform: 'uppercase',
       letterSpacing: 2,
@@ -199,7 +204,6 @@ function makeStyles(colors: ReturnType<typeof useTheme>['colors']) {
       fontSize: 26,
       fontWeight: 'bold',
       lineHeight: 30,
-      // fontFamily: 'serif',
     },
     headerRight: {
       alignItems: 'center',
@@ -212,7 +216,6 @@ function makeStyles(colors: ReturnType<typeof useTheme>['colors']) {
     streakBadge: { fontSize: 24, color: colors.parchment, },
     streakLabel: {
       color: colors.parchmentDark,
-      // fontFamily: 'monospace',
       fontSize: 9,
       textTransform: 'uppercase',
     },
@@ -237,7 +240,6 @@ function makeStyles(colors: ReturnType<typeof useTheme>['colors']) {
     },
     locationLabel: {
       color: colors.dirtLight,
-      // fontFamily: 'monospace',
       fontSize: 9,
       textTransform: 'uppercase',
       letterSpacing: 1,
@@ -245,7 +247,6 @@ function makeStyles(colors: ReturnType<typeof useTheme>['colors']) {
     },
     locationValue: {
       color: colors.parchment,
-      // fontFamily: 'monospace',
       fontSize: 10,
       fontWeight: 'bold',
       textAlign: 'center',
@@ -268,13 +269,11 @@ function makeStyles(colors: ReturnType<typeof useTheme>['colors']) {
     statusIcon: { fontSize: 18, marginBottom: 2 },
     statusLabel: {
       color: colors.dirtLight,
-      // fontFamily: 'monospace',
       fontSize: 9,
       textTransform: 'uppercase',
     },
     statusValue: {
       color: colors.parchment,
-      // fontFamily: 'monospace',
       fontSize: 10,
       fontWeight: 'bold',
       marginTop: 2,
@@ -289,7 +288,7 @@ function makeStyles(colors: ReturnType<typeof useTheme>['colors']) {
       borderWidth: 1,
       borderColor: colors.border,
       gap: 8,
-      justifyContent: 'space-between',  // ← pushes button to bottom
+      justifyContent: 'space-between',
     },
     healthCard: {
       flex: 1.4,
@@ -302,7 +301,6 @@ function makeStyles(colors: ReturnType<typeof useTheme>['colors']) {
     },
     cardTitle: {
       color: colors.trailGold,
-      // fontFamily: 'monospace',
       fontSize: 9,
       textTransform: 'uppercase',
       letterSpacing: 2,
@@ -319,7 +317,6 @@ function makeStyles(colors: ReturnType<typeof useTheme>['colors']) {
     },
     logButtonText: {
       color: colors.trailGold,
-      // fontFamily: 'monospace',
       fontSize: 10,
     },
     rewardsPreview: {
@@ -334,13 +331,11 @@ function makeStyles(colors: ReturnType<typeof useTheme>['colors']) {
     rewardsLeft: { flex: 1 },
     rewardsTitle: {
       color: colors.parchment,
-      // fontFamily: 'monospace',
       fontSize: 14,
       fontWeight: 'bold',
     },
     rewardsSub: {
       color: colors.dirtLight,
-      // fontFamily: 'monospace',
       fontSize: 10,
       marginTop: 3,
     },
@@ -358,7 +353,6 @@ function makeStyles(colors: ReturnType<typeof useTheme>['colors']) {
     tipIcon: { fontSize: 18 },
     tipText: {
       color: colors.parchmentDark,
-      // fontFamily: 'monospace',
       fontSize: 11,
       flex: 1,
       lineHeight: 16,
