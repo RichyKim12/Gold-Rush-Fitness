@@ -14,9 +14,11 @@ import { MOCK_STATE } from '../../constants/mockData';
 
 type Filter = 'all' | 'unlocked' | 'locked';
 
-// Total width of the scrollable trail map in pixels
-const TRAIL_MAP_WIDTH = 1400;
-const TRAIL_MAP_HEIGHT = 100;
+// Total width of the scrollable trail map in pixels — higher = more zoomed in
+const TRAIL_MAP_WIDTH = 2800;
+const TRAIL_MAP_HEIGHT = 140;
+// Padding on each side so start/end labels aren't clipped
+const TRAIL_H_PADDING = 100;
 
 export default function RewardsScreen() {
   const { colors } = useTheme();
@@ -31,18 +33,20 @@ export default function RewardsScreen() {
   });
 
   const progressPercent = (state.trailMiles / TRAIL_TOTAL_MILES) * 100;
-  const wagonX = (progressPercent / 100) * TRAIL_MAP_WIDTH;
+  const wagonX = TRAIL_H_PADDING + (progressPercent / 100) * TRAIL_MAP_WIDTH;
 
-  // Auto-scroll to keep wagon centered
+  const scrollToWagon = (animated = true) => {
+    trailScrollRef.current?.scrollTo({
+      x: Math.max(0, wagonX - 140),
+      animated,
+    });
+  };
+
+  // Scroll to wagon on mount (no animation so it snaps immediately)
   useEffect(() => {
-    const timer = setTimeout(() => {
-      trailScrollRef.current?.scrollTo({
-        x: Math.max(0, wagonX - 140),
-        animated: true,
-      });
-    }, 400);
+    const timer = setTimeout(() => scrollToWagon(false), 100);
     return () => clearTimeout(timer);
-  }, [wagonX]);
+  }, []);
 
   const s = makeStyles(colors);
 
@@ -77,66 +81,106 @@ export default function RewardsScreen() {
 
         {/* Trail progress map — horizontal scroller */}
         <View style={s.trailCard}>
-          <Text style={s.cardTitle}>TRAIL PROGRESS MAP</Text>
-          <Text style={s.trailStats}>
-            {state.trailMiles.toLocaleString()} / {TRAIL_TOTAL_MILES.toLocaleString()} miles
-            ({progressPercent.toFixed(1)}%)
-          </Text>
 
-          {/* Fade-edge wrapper */}
+          {/* Header row: title + jump button */}
+          <View style={s.trailCardHeader}>
+            <View>
+              <Text style={s.cardTitle}>TRAIL PROGRESS MAP</Text>
+              <Text style={s.trailStats}>
+                {state.trailMiles.toLocaleString()} / {TRAIL_TOTAL_MILES.toLocaleString()} mi
+                {' '}· {progressPercent.toFixed(1)}% complete
+              </Text>
+            </View>
+            <TouchableOpacity
+              style={[s.jumpBtn, { borderColor: colors.trailGold }]}
+              onPress={() => scrollToWagon(true)}
+              activeOpacity={0.7}
+            >
+              <Text style={[s.jumpBtnIcon, { color: colors.trailGold }]}>🪙</Text>
+              <Text style={[s.jumpBtnLabel, { color: colors.trailGold }]}>My Position</Text>
+            </TouchableOpacity>
+          </View>
+
+          {/* Scrollable map */}
           <View style={s.trailScrollWrapper}>
             <ScrollView
               ref={trailScrollRef}
               horizontal
               showsHorizontalScrollIndicator={false}
               style={s.trailScroll}
-              contentContainerStyle={{ width: TRAIL_MAP_WIDTH }}
+              contentContainerStyle={{ width: TRAIL_MAP_WIDTH + TRAIL_H_PADDING * 2, paddingVertical: 8 }}
             >
-              {/* Fixed-height canvas */}
-              <View style={{ width: TRAIL_MAP_WIDTH, height: TRAIL_MAP_HEIGHT + 40 }}>
+              <View style={{ width: TRAIL_MAP_WIDTH + TRAIL_H_PADDING * 2, height: TRAIL_MAP_HEIGHT + 100 }}>
+
+                {/* Visited (gold) portion background strip */}
+                <View
+                  style={[
+                    s.trailVisitedBg,
+                    { left: TRAIL_H_PADDING, width: Math.max(0, wagonX - TRAIL_H_PADDING) },
+                  ]}
+                />
 
                 {/* Base trail line */}
-                <View style={[s.trailLine, { width: TRAIL_MAP_WIDTH }]} />
+                <View style={[s.trailLine, { left: TRAIL_H_PADDING, width: TRAIL_MAP_WIDTH }]} />
 
                 {/* Progress fill */}
-                <View style={[s.trailLineFill, { width: wagonX }]} />
+                <View style={[s.trailLineFill, { left: TRAIL_H_PADDING, width: wagonX - TRAIL_H_PADDING }]} />
+
+                {/* Mile tick marks every ~100 miles */}
+                {Array.from({ length: Math.floor(TRAIL_TOTAL_MILES / 100) }).map((_, i) => {
+                  const mile = (i + 1) * 100;
+                  const x = TRAIL_H_PADDING + (mile / TRAIL_TOTAL_MILES) * TRAIL_MAP_WIDTH;
+                  const passed = state.trailMiles >= mile;
+                  return (
+                    <View key={`tick-${i}`} style={[s.tickMark, { left: x }]}>
+                      <View style={[s.tickLine, { backgroundColor: passed ? colors.trailGold : colors.dirtDark, opacity: 0.5 }]} />
+                      <Text style={[s.tickLabel, { color: passed ? colors.trailGold : colors.dirtLight, opacity: passed ? 0.7 : 0.4 }]}>
+                        {mile}
+                      </Text>
+                    </View>
+                  );
+                })}
 
                 {/* Milestones */}
                 {MILESTONES.map((m, i) => {
-                  const x = (m.mile / TRAIL_TOTAL_MILES) * TRAIL_MAP_WIDTH;
+                  const x = TRAIL_H_PADDING + (m.mile / TRAIL_TOTAL_MILES) * TRAIL_MAP_WIDTH;
                   const passed = state.trailMiles >= m.mile;
-                  const above = i % 2 === 0;
                   return (
                     <View
                       key={i}
-                      style={[s.milestoneDot, { left: x - 12 }]}
+                      style={[s.milestoneDot, { left: x, transform: [{ translateX: -40 }] }]}
                     >
-                      {above && (
-                        <Text style={[s.milestoneName, s.milestoneAbove, { opacity: passed ? 1 : 0.4 }]}>
-                          {m.name.split(',')[0]}
-                        </Text>
-                      )}
+                      {/* Dot on the trail line */}
+                      <View style={[s.milestonePip, {
+                        backgroundColor: passed ? colors.trailGold : colors.dirtDark,
+                        borderColor: passed ? colors.parchment : colors.dirtLight,
+                        opacity: passed ? 1 : 0.5,
+                      }]} />
+                      {/* Emoji below */}
                       <Text style={[s.milestoneEmoji, { opacity: passed ? 1 : 0.35 }]}>
                         {m.emoji}
                       </Text>
-                      {!above && (
-                        <Text style={[s.milestoneName, s.milestoneBelow, { opacity: passed ? 1 : 0.4 }]}>
-                          {m.name.split(',')[0]}
-                        </Text>
-                      )}
+                      {/* City name below emoji */}
+                      <Text
+                        style={[s.milestoneName, { color: passed ? colors.parchment : colors.parchmentDark, opacity: passed ? 1 : 0.45 }]}
+                      >
+                        {m.name.split(',')[0]}
+                      </Text>
                     </View>
                   );
                 })}
 
                 {/* Wagon marker */}
-                <View style={[s.wagonMarker, { left: wagonX - 12 }]}>
+                <View style={[s.wagonMarker, { left: wagonX - 14 }]}>
                   <Text style={s.wagonEmoji}>🪙</Text>
+                  {/* Vertical needle to the trail line */}
+                  <View style={[s.wagonNeedle, { backgroundColor: colors.trailGold }]} />
                 </View>
 
               </View>
             </ScrollView>
 
-            {/* Left fade overlay */}
+            {/* Fade edges */}
             <LinearGradient
               colors={[colors.bgCard, `${colors.bgCard}00`]}
               start={{ x: 0, y: 0 }}
@@ -144,7 +188,6 @@ export default function RewardsScreen() {
               style={s.fadeLeft}
               pointerEvents="none"
             />
-            {/* Right fade overlay */}
             <LinearGradient
               colors={[`${colors.bgCard}00`, colors.bgCard]}
               start={{ x: 0, y: 0 }}
@@ -153,6 +196,7 @@ export default function RewardsScreen() {
               pointerEvents="none"
             />
           </View>
+
         </View>
 
         {/* Filter tabs */}
@@ -311,13 +355,22 @@ function makeStyles(colors: ReturnType<typeof useTheme>['colors']) {
       letterSpacing: 0.5,
       marginTop: 2,
     },
+
+    // Trail card
     trailCard: {
       backgroundColor: colors.bgCard,
       borderRadius: 10,
-      padding: 14,
+      paddingTop: 14,
+      paddingHorizontal: 14,
+      paddingBottom: 10,
       gap: 10,
       borderWidth: 1,
       borderColor: colors.border,
+    },
+    trailCardHeader: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'flex-start',
     },
     cardTitle: {
       color: colors.trailGold,
@@ -330,75 +383,138 @@ function makeStyles(colors: ReturnType<typeof useTheme>['colors']) {
       color: colors.dirtLight,
       fontFamily: 'monospace',
       fontSize: 10,
+      marginTop: 2,
+    },
+    jumpBtn: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 4,
+      borderWidth: 1,
+      borderRadius: 6,
+      paddingHorizontal: 10,
+      paddingVertical: 5,
+    },
+    jumpBtnIcon: {
+      fontSize: 13,
+    },
+    jumpBtnLabel: {
+      fontFamily: 'monospace',
+      fontSize: 10,
+      fontWeight: 'bold',
+      textTransform: 'uppercase',
+      letterSpacing: 0.5,
     },
     trailScrollWrapper: {
       position: 'relative',
-      height: TRAIL_MAP_HEIGHT + 40,
+      height: TRAIL_MAP_HEIGHT + 112,
+      marginHorizontal: -14,
     },
     trailScroll: {
       flex: 1,
     },
+
+    // Visited background glow
+    trailVisitedBg: {
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      bottom: 0,
+      backgroundColor: `${colors.trailGold}0a`,
+    },
+
+    // Trail line
     trailLine: {
       position: 'absolute',
-      top: TRAIL_MAP_HEIGHT / 2,
+      top: TRAIL_MAP_HEIGHT / 2 + 8,
       left: 0,
-      height: 5,
+      height: 6,
       backgroundColor: colors.dirtDark,
       borderRadius: 3,
     },
     trailLineFill: {
       position: 'absolute',
-      top: TRAIL_MAP_HEIGHT / 2,
+      top: TRAIL_MAP_HEIGHT / 2 + 8,
       left: 0,
-      height: 5,
+      height: 6,
       backgroundColor: colors.trailGold,
       borderRadius: 3,
     },
-    milestoneDot: {
+
+    // Tick marks
+    tickMark: {
       position: 'absolute',
-      top: TRAIL_MAP_HEIGHT / 2 - 12,
+      top: TRAIL_MAP_HEIGHT / 2 + 16,
       alignItems: 'center',
-      width: 24,
     },
-    milestoneEmoji: {
-      fontSize: 20,
+    tickLine: {
+      width: 1,
+      height: 8,
     },
-    milestoneName: {
-      color: colors.parchmentDark,
+    tickLabel: {
       fontFamily: 'monospace',
-      fontSize: 7,
-      width: 52,
-      textAlign: 'center',
-    },
-    milestoneAbove: {
-      marginBottom: 2,
-    },
-    milestoneBelow: {
+      fontSize: 12,
       marginTop: 2,
     },
+
+    // Milestones — pip sits on the trail line, emoji+name hang below
+    milestoneDot: {
+      position: 'absolute',
+      top: TRAIL_MAP_HEIGHT / 2 + 5,  // aligns pip centre to trail line
+      alignItems: 'center',
+    },
+    milestonePip: {
+      width: 12,
+      height: 12,
+      borderRadius: 6,
+      borderWidth: 1.5,
+    },
+    milestoneEmoji: {
+      fontSize: 28,
+      marginTop: 20,
+    },
+    milestoneName: {
+      fontFamily: 'monospace',
+      fontSize: 13,
+      textAlign: 'center',
+      marginTop: 4,
+    },
+    milestoneAbove: {},   // unused — everything is below
+    milestoneBelow: {},   // kept for JSX compat, no extra margin needed
+
+    // Wagon
     wagonMarker: {
       position: 'absolute',
-      top: TRAIL_MAP_HEIGHT / 2 - 28,
-      width: 24,
+      top: TRAIL_MAP_HEIGHT / 2 - 50,
+      width: 28,
       alignItems: 'center',
     },
     wagonEmoji: {
-      fontSize: 22,
+      fontSize: 30,
     },
+    wagonNeedle: {
+      width: 2,
+      height: 28,
+      borderRadius: 1,
+      opacity: 0.6,
+    },
+
+    // Fade edges
     fadeLeft: {
       position: 'absolute',
       left: 0,
       top: 0,
       bottom: 0,
-      width: 28,
+      width: 24,
     },
     fadeRight: {
       position: 'absolute',
       right: 0,
       top: 0,
       bottom: 0,
-      width: 28,
+      width: 24,
     },
+
+    // Filter
     filterRow: {
       flexDirection: 'row',
       gap: 8,
@@ -425,6 +541,8 @@ function makeStyles(colors: ReturnType<typeof useTheme>['colors']) {
       color: colors.inkDark,
       fontWeight: 'bold',
     },
+
+    // Badges
     badgeGrid: {
       flexDirection: 'row',
       flexWrap: 'wrap',
@@ -517,6 +635,8 @@ function makeStyles(colors: ReturnType<typeof useTheme>['colors']) {
       fontSize: 9,
       letterSpacing: 1,
     },
+
+    // Challenge
     challengeCard: {
       backgroundColor: colors.bgCard,
       borderRadius: 10,
