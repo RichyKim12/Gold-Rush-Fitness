@@ -4,7 +4,7 @@ class HealthAPIClient {
     
     static let shared = HealthAPIClient()
     
-    private let baseURL = "http://localhost:8000"  // Change to your deployed URL
+    private let baseURL = "http://172.25.147.19:8000"  // Your Mac's local IP
     private var token: String? {
         UserDefaults.standard.string(forKey: "auth_token")
     }

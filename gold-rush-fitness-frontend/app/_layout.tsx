@@ -1,8 +1,9 @@
 // app/_layout.tsx
-import { Stack } from 'expo-router';
+import { Stack, useRouter, useSegments } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { Text, TextInput } from 'react-native';
+import { Text, TextInput, ActivityIndicator, View } from 'react-native';
 import { ThemeProvider, useTheme } from '../context/ThemeContext';
+import { AuthProvider, useAuth } from '../context/AuthContext';
 import { useFonts, PressStart2P_400Regular } from '@expo-google-fonts/press-start-2p';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
@@ -16,6 +17,42 @@ SplashScreen.preventAutoHideAsync();
 (TextInput as any).defaultProps = (TextInput as any).defaultProps || {};
 (TextInput as any).defaultProps.style = { fontFamily: 'PressStart2P_400Regular' };
 
+function AuthGate() {
+  const { isLoggedIn, isLoading } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (isLoading) return;
+
+    if (!isLoggedIn) {
+      router.replace('/(auth)/login');
+    }
+  }, [isLoggedIn, isLoading]);
+
+  useEffect(() => {
+    if (isLoading) return;
+
+    if (isLoggedIn) {
+      router.replace('/(tabs)');
+    }
+  }, [isLoggedIn, isLoading]);
+
+  if (isLoading) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#1a1206' }}>
+        <ActivityIndicator size="large" color="#d4a017" />
+      </View>
+    );
+  }
+
+  return (
+    <Stack screenOptions={{ headerShown: false }}>
+      <Stack.Screen name="(auth)" />
+      <Stack.Screen name="(tabs)" />
+    </Stack>
+  );
+}
+
 function RootLayoutInner() {
   const { activeTheme } = useTheme();
   const [fontsLoaded] = useFonts({ PressStart2P_400Regular });
@@ -23,15 +60,13 @@ function RootLayoutInner() {
   useEffect(() => {
     if (fontsLoaded) SplashScreen.hideAsync();
   }, [fontsLoaded]);
-  console.log('fonts loaded:', fontsLoaded, PressStart2P_400Regular); // ← add this
+
   if (!fontsLoaded) return null;
 
   return (
     <>
       <StatusBar style={activeTheme === 'dark' ? 'light' : 'dark'} />
-      <Stack screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="(tabs)" />
-      </Stack>
+      <AuthGate />
     </>
   );
 }
@@ -39,7 +74,9 @@ function RootLayoutInner() {
 export default function RootLayout() {
   return (
     <ThemeProvider>
-      <RootLayoutInner />
+      <AuthProvider>
+        <RootLayoutInner />
+      </AuthProvider>
     </ThemeProvider>
   );
 }

@@ -1,3 +1,9 @@
+---
+noteId: "67a16450258e11f1bc473199fa69d114"
+tags: []
+
+---
+
 # Gold Rush Fitness - Backend Server
 
 FastAPI backend with PostgreSQL database for the Gold Rush Fitness app.
