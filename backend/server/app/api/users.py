@@ -45,6 +45,7 @@ class DashboardResponse(BaseModel):
     pace: str
     vitality: int
     vitalityMax: int
+    dayOnTrail: int
     todayGoalProgress: TodayGoalProgress
 
 
@@ -100,11 +101,12 @@ def get_dashboard(
         todaySteps=today_steps,
         weekHistory=week_history,
         unlockedRewards=achievement_ids,
-        healthScore=stats.health_score if stats else 0,
+        healthScore=stats.health_score if stats else 100,
         rations=stats.rations if stats else "Filling",
         pace=stats.pace if stats else "Steady",
-        vitality=user.vitality,
-        vitalityMax=user.vitality_max,
+        vitality=user.vitality if user.vitality else 100,
+        vitalityMax=user.vitality_max if user.vitality_max else 100,
+        dayOnTrail=stats.day_on_trail if stats else 0,
         todayGoalProgress=TodayGoalProgress(
             completedTiers=today_goal.completed_tiers,
             totalTiers=today_goal.total_tiers,

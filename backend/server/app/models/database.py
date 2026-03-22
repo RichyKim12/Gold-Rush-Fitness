@@ -18,13 +18,34 @@ class User(Base):
     email = Column(String(255), unique=True, index=True, nullable=False)
     password_hash = Column(String(255), nullable=False)
     display_name = Column(String(100), nullable=False)
-    vitality = Column(Integer, default=10)
-    vitality_max = Column(Integer, default=10)
+    party_size = Column(Integer, default=4)
+    vitality = Column(Integer, default=100)
+    vitality_max = Column(Integer, default=100)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
 
     daily_logs = relationship("DailyLog", back_populates="user", cascade="all, delete-orphan")
     achievements = relationship("UserAchievement", back_populates="user", cascade="all, delete-orphan")
+    stats = relationship("UserStats", back_populates="user", uselist=False, cascade="all, delete-orphan")
+
+
+class UserStats(Base):
+    __tablename__ = "user_stats"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False, unique=True)
+    trail_miles = Column(Integer, default=0)
+    current_streak = Column(Integer, default=0)
+    longest_streak = Column(Integer, default=0)
+    total_steps = Column(Integer, default=0)
+    health_score = Column(Integer, default=100)
+    rations = Column(String(20), default="Filling")
+    pace = Column(String(20), default="Steady")
+    day_on_trail = Column(Integer, default=0)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+
+    user = relationship("User", back_populates="stats")
 
 
 class DailyLog(Base):

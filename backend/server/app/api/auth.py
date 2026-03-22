@@ -63,6 +63,7 @@ def register(request: RegisterRequest, db: Session = Depends(get_db)):
         health_score=100,
         rations="Filling",
         pace="Steady",
+        day_on_trail=0,
     )
     db.add(user_stats)
     db.commit()

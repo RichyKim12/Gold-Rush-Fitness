@@ -63,6 +63,7 @@ export interface DashboardResponse {
   pace: 'Grueling' | 'Strenuous' | 'Steady' | 'Leisurely';
   vitality: number;
   vitalityMax: number;
+  dayOnTrail: number;
   todayGoalProgress: TodayGoalProgress;
 }
 

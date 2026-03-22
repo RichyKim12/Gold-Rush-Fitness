@@ -79,8 +79,12 @@ async def get_dashboard(
     )
 
     # Health score (percentage of days with goal met in last 7 days)
-    days_met = sum(1 for r in week_history if r.goalMet)
-    health_score = int((days_met / 7) * 100)
+    # New users with no activity should start at full vitality.
+    if total_steps == 0:
+        health_score = 100
+    else:
+        days_met = sum(1 for r in week_history if r.goalMet)
+        health_score = int((days_met / 7) * 100)
 
     # Unlocked rewards (mock for now)
     earned = db.query(UserAchievement).filter_by(user_id=user.id).all()
@@ -101,6 +105,7 @@ async def get_dashboard(
         pace="Steady",
         vitality=100,
         vitalityMax=100,
+        dayOnTrail=user.day_on_trail or 0,
     )
 
 

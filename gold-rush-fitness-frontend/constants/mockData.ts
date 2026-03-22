@@ -20,6 +20,7 @@ export interface AppState {
   healthScore: number; // 0–100 based on consistency
   rations: 'Filling' | 'Meager' | 'Bare Bones';
   pace: 'Grueling' | 'Strenuous' | 'Steady' | 'Leisurely';
+  dayOnTrail: number;
 }
 
 export const MOCK_STATE: AppState = {
@@ -43,4 +44,5 @@ export const MOCK_STATE: AppState = {
   healthScore: 72,
   rations: 'Filling',
   pace: 'Steady',
+  dayOnTrail: 0,
 };

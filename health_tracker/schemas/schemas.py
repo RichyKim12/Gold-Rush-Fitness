@@ -72,6 +72,7 @@ class DashboardResponse(BaseModel):
     pace: str = "Steady"
     vitality: int = 100
     vitalityMax: int = 100
+    dayOnTrail: int = 0
 
 
 # ── History ──

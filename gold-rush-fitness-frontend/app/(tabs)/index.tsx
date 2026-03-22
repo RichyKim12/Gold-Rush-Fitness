@@ -56,7 +56,7 @@ export default function HomeScreen() {
         {/* Header */}
         <View style={s.header}>
           <View>
-            <Text style={s.eyebrow}>🪵 Day 39 on the Trail</Text>
+            <Text style={s.eyebrow}>🪵 Day {state.dayOnTrail} on the Trail</Text>
             <Text style={s.title}>
               {state.playerName}'s{'\n'}Wagon Party
             </Text>

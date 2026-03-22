@@ -22,9 +22,10 @@ function mapDashboardToAppState(dashboard: api.DashboardResponse): AppState {
     todaySteps: dashboard.todaySteps,
     weekHistory: dashboard.weekHistory,
     unlockedRewards: dashboard.unlockedRewards,
-    healthScore: dashboard.healthScore,
+    healthScore: dashboard.totalSteps === 0 ? 100 : (dashboard.healthScore ?? 100),
     rations: dashboard.rations,
     pace: dashboard.pace,
+    dayOnTrail: dashboard.dayOnTrail ?? 0,
   };
 }
 
@@ -42,6 +43,7 @@ export function useAppData(): UseAppDataReturn {
     healthScore: 100,
     rations: 'Filling',
     pace: 'Steady',
+    dayOnTrail: 0,
   });
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
