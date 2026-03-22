@@ -15,11 +15,15 @@ import { DAILY_STEP_GOAL, TRAIL_TOTAL_MILES } from '../../constants/theme';
 import { useAppData } from '../../hooks/useAppData';
 import StepRing from '../../components/StepRing';
 import WeekHeatmap from '../../components/WeekHeatmap';
+import useHealthData from '../../hooks/useHealthData';
+import useWeeklySteps from '../../hooks/useWeeklySteps';
 
 export default function StepsScreen() {
   const { colors } = useTheme();
   const { state, isLoading, error } = useAppData();
   const [selectedGoal, setSelectedGoal] = useState(DAILY_STEP_GOAL);
+  const { steps: realSteps, error: healthError } = useHealthData(new Date());
+  const { weekHistory } = useWeeklySteps();
   const [showInfo, setShowInfo] = useState(false);
 
   if (isLoading || error) {
@@ -34,8 +38,8 @@ export default function StepsScreen() {
   }
 
   const goals = [6000, 8000, 10000, 12000, 15000];
-  const milesEarned = Math.floor(state.todaySteps / 2000);
-  const stepsLeft = Math.max(0, selectedGoal - state.todaySteps);
+  const milesEarned = Math.floor(realSteps / 2000);
+  const stepsLeft = Math.max(0, selectedGoal - realSteps);
   const minutesLeft = Math.round(stepsLeft / 100);
 
   const s = makeStyles(colors);
@@ -59,7 +63,7 @@ export default function StepsScreen() {
         </View>
 
         {/* WEEK HEATMAP */}
-        <WeekHeatmap history={state.weekHistory} />
+        <WeekHeatmap history={weekHistory.length > 0 ? weekHistory : state.weekHistory} />
 
         {/* Goal selector */}
         <View style={s.goalCard}>
@@ -84,10 +88,10 @@ export default function StepsScreen() {
 
         {/* Main ring */}
         <View style={s.ringCard}>
-          <StepRing steps={state.todaySteps} goal={selectedGoal} />
+          <StepRing steps={realSteps} goal={selectedGoal} />
           <View style={s.statsGrid}>
             <View style={s.statBox}>
-              <Text style={s.statValue}>{state.todaySteps.toLocaleString()}</Text>
+              <Text style={s.statValue}>{realSteps.toLocaleString()}</Text>
               <Text style={s.statLabel}>Steps Today</Text>
             </View>
             <View style={s.statBox}>
