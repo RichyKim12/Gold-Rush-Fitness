@@ -4,6 +4,7 @@ import { StatusBar } from 'expo-status-bar';
 import { Text, TextInput, ActivityIndicator, View } from 'react-native';
 import { ThemeProvider, useTheme } from '../context/ThemeContext';
 import { AuthProvider, useAuth } from '../context/AuthContext';
+import { HydrationProvider } from '../context/HydrationContext';
 import { useFonts, PressStart2P_400Regular } from '@expo-google-fonts/press-start-2p';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
@@ -75,7 +76,9 @@ export default function RootLayout() {
   return (
     <ThemeProvider>
       <AuthProvider>
-        <RootLayoutInner />
+        <HydrationProvider>
+          <RootLayoutInner />
+        </HydrationProvider>
       </AuthProvider>
     </ThemeProvider>
   );

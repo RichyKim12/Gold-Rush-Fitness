@@ -22,6 +22,7 @@ import {
   SkullIcon,
   HealthIcon,
 } from '../../components/PixelIcons';
+import { useHydration } from '../../context/HydrationContext';
 
 type AilmentKey = 'Dysentery' | 'Exhaustion' | 'Dehyrdration' | 'TBD';
 
@@ -42,6 +43,8 @@ const AILMENTS: { name: AilmentKey; risk: string; tip: string }[] = [
 export default function HealthScreen() {
   const { colors } = useTheme();
   const { state, isLoading, error } = useAppData();
+  const { ozLogged } = useHydration();
+  const DAILY_OZ_GOAL = 64;
 
   if (isLoading || error) {
     return (
@@ -74,6 +77,21 @@ export default function HealthScreen() {
         <View style={s.titleRow}>
           <HealthIcon size={22} />
           <Text style={s.screenTitle}>Health Report</Text>
+        </View>
+
+        {/* Hydration Today */}
+        <View style={[s.overallCard, { marginBottom: 12 }]}>
+          <View style={s.overallLeft}>
+            <DehydrationIcon size={16} />
+            <Text style={[s.overallTitle, { marginTop: 6 }]}>Hydration Today</Text>
+            <Text style={{ color: colors.textMuted, fontSize: 9, marginTop: 4 }}>{ozLogged} / {DAILY_OZ_GOAL} oz</Text>
+          </View>
+          <View style={s.overallRight}>
+            <Text style={[s.overallScore, { color: ozLogged >= DAILY_OZ_GOAL ? colors.healthFull : ozLogged >= DAILY_OZ_GOAL / 2 ? colors.healthGood : colors.healthEmpty }]}>
+              {Math.min(100, Math.round((ozLogged / DAILY_OZ_GOAL) * 100))}
+            </Text>
+            <Text style={s.overallUnit}>%</Text>
+          </View>
         </View>
 
         {/* Overall health */}
