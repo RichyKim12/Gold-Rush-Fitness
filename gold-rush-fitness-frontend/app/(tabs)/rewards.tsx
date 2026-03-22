@@ -474,7 +474,7 @@ function makeStyles(colors: ReturnType<typeof useTheme>['colors']) {
     },
     milestoneEmoji: {
       fontSize: 28,
-      marginTop: 10,
+      marginTop: 22,
     },
     milestoneName: {
       fontFamily: 'monospace',
@@ -599,7 +599,7 @@ function makeStyles(colors: ReturnType<typeof useTheme>['colors']) {
     badgeDesc: {
       color: colors.dirtLight,
       fontFamily: 'monospace',
-      fontSize: 8,
+      fontSize: 13,
       textAlign: 'center',
       lineHeight: 12,
     },
@@ -612,7 +612,7 @@ function makeStyles(colors: ReturnType<typeof useTheme>['colors']) {
     conditionText: {
       color: colors.trailGold,
       fontFamily: 'monospace',
-      fontSize: 8,
+      fontSize: 12,
     },
     badgeProgress: {
       flexDirection: 'row',
