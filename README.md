@@ -1,6 +1,6 @@
 # Gold Rush Fitness
 
-> **HoosHack 2025 — Health and Wellness Category**
+> **HoosHack 2026 — Health and Wellness Category**
 
 An Oregon Trail-themed iOS fitness tracker. Walk your steps, survive the trail, and make it to Oregon City without dying of dysentery.
 
