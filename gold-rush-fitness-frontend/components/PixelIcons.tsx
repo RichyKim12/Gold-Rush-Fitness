@@ -328,3 +328,38 @@ export function StarIcon({ size = 18 }: { size?: number }) {
     </Svg>
   );
 }
+
+
+// ─── Coin (wagon position marker) ────────────────────────────────────────────
+export function CoinIcon({ size = 18 }: { size?: number }) {
+  const pixels: PixelList = [
+    [1,0,'#D4A017'],[2,0,'#f0c040'],[3,0,'#D4A017'],
+    [0,1,'#D4A017'],[1,1,'#f0c040'],[2,1,'#fffacc'],[3,1,'#f0c040'],[4,1,'#D4A017'],
+    [0,2,'#D4A017'],[1,2,'#f0c040'],[2,2,'#D4A017'],[3,2,'#f0c040'],[4,2,'#D4A017'],
+    [0,3,'#D4A017'],[1,3,'#f0c040'],[2,3,'#f0c040'],[3,3,'#f0c040'],[4,3,'#D4A017'],
+    [1,4,'#D4A017'],[2,4,'#f0c040'],[3,4,'#D4A017'],
+  ];
+  return (
+    <Svg width={size} height={size} viewBox="0 0 15 15">
+      {pixels.map(([c, r, color], i) => px(c, r, color, i))}
+    </Svg>
+  );
+}
+
+// ─── Lightning / Challenge ────────────────────────────────────────────────────
+export function LightningIcon({ size = 18 }: { size?: number }) {
+  const pixels: PixelList = [
+    [3,0,'#f0c040'],[4,0,'#f0c040'],[5,0,'#f0c040'],
+    [2,1,'#f0c040'],[3,1,'#f0c040'],[4,1,'#D4A017'],
+    [1,2,'#f0c040'],[2,2,'#f0c040'],[3,2,'#D4A017'],
+    [0,3,'#f0c040'],[1,3,'#f0c040'],[2,3,'#f0c040'],[3,3,'#f0c040'],[4,3,'#f0c040'],
+    [1,4,'#D4A017'],[2,4,'#f0c040'],[3,4,'#f0c040'],
+    [2,5,'#D4A017'],[3,5,'#f0c040'],
+    [3,6,'#D4A017'],
+  ];
+  return (
+    <Svg width={size} height={size * 1.2} viewBox="0 0 18 21">
+      {pixels.map(([c, r, color], i) => px(c, r, color, i))}
+    </Svg>
+  );
+}

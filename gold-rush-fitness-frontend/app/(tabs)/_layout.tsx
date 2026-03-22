@@ -15,7 +15,9 @@ function TabIcon({
 }) {
   return (
     <View style={styles.tabIcon}>
-      <Icon focused={focused} />
+      <View style={styles.iconWrap}>
+        <Icon focused={focused} />
+      </View>
       <Text style={[styles.tabLabel, focused && styles.tabLabelFocused]}>
         {label}
       </Text>
@@ -81,6 +83,12 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingTop: 4,
     gap: 3,
+  },
+  iconWrap: {
+    width: 28,
+    height: 28,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   tabLabel: {
     color: Colors.dirtLight,

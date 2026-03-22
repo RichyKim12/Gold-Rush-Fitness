@@ -11,13 +11,12 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { useTheme } from '../../context/ThemeContext';
 import { REWARDS, MILESTONES, TRAIL_TOTAL_MILES } from '../../constants/theme';
 import { MOCK_STATE } from '../../constants/mockData';
+import { TrophyIcon, CoinIcon, LightningIcon } from '../../components/PixelIcons';
 
 type Filter = 'all' | 'unlocked' | 'locked';
 
-// Total width of the scrollable trail map in pixels — higher = more zoomed in
 const TRAIL_MAP_WIDTH = 2800;
 const TRAIL_MAP_HEIGHT = 140;
-// Padding on each side so start/end labels aren't clipped
 const TRAIL_H_PADDING = 100;
 
 export default function RewardsScreen() {
@@ -43,7 +42,6 @@ export default function RewardsScreen() {
     return true;
   });
 
-  // Scroll to wagon on mount (no animation so it snaps immediately)
   useEffect(() => {
     const timer = setTimeout(() => scrollToWagon(false), 100);
     return () => clearTimeout(timer);
@@ -57,7 +55,12 @@ export default function RewardsScreen() {
       style={s.root}
     >
       <ScrollView contentContainerStyle={s.scroll} showsVerticalScrollIndicator={false}>
-        <Text style={s.screenTitle}>🏆 Rewards & Badges</Text>
+
+        {/* Title */}
+        <View style={s.titleRow}>
+          <TrophyIcon size={22} />
+          <Text style={s.screenTitle}>Rewards & Badges</Text>
+        </View>
         <Text style={s.screenSub}>Earn badges by walking the trail</Text>
 
         {/* Summary stats */}
@@ -80,10 +83,8 @@ export default function RewardsScreen() {
           </View>
         </View>
 
-        {/* Trail progress map — horizontal scroller */}
+        {/* Trail progress map */}
         <View style={s.trailCard}>
-
-          {/* Header row: title + jump button */}
           <View style={s.trailCardHeader}>
             <View>
               <Text style={s.cardTitle}>TRAIL PROGRESS MAP</Text>
@@ -97,12 +98,11 @@ export default function RewardsScreen() {
               onPress={() => scrollToWagon(true)}
               activeOpacity={0.7}
             >
-              <Text style={[s.jumpBtnIcon, { color: colors.trailGold }]}>🪙</Text>
+              <CoinIcon size={13} />
               <Text style={[s.jumpBtnLabel, { color: colors.trailGold }]}>My Position</Text>
             </TouchableOpacity>
           </View>
 
-          {/* Scrollable map */}
           <View
             style={s.trailScrollWrapper}
             onLayout={(e) => setScrollViewWidth(e.nativeEvent.layout.width)}
@@ -116,7 +116,6 @@ export default function RewardsScreen() {
             >
               <View style={{ width: TRAIL_MAP_WIDTH + TRAIL_H_PADDING * 2, height: TRAIL_MAP_HEIGHT + 100 }}>
 
-                {/* Visited (gold) portion background strip */}
                 <View
                   style={[
                     s.trailVisitedBg,
@@ -124,13 +123,9 @@ export default function RewardsScreen() {
                   ]}
                 />
 
-                {/* Base trail line */}
                 <View style={[s.trailLine, { left: TRAIL_H_PADDING, width: TRAIL_MAP_WIDTH }]} />
-
-                {/* Progress fill */}
                 <View style={[s.trailLineFill, { left: TRAIL_H_PADDING, width: wagonX - TRAIL_H_PADDING }]} />
 
-                {/* Mile tick marks every ~100 miles */}
                 {Array.from({ length: Math.floor(TRAIL_TOTAL_MILES / 100) }).map((_, i) => {
                   const mile = (i + 1) * 100;
                   const x = TRAIL_H_PADDING + (mile / TRAIL_TOTAL_MILES) * TRAIL_MAP_WIDTH;
@@ -145,46 +140,35 @@ export default function RewardsScreen() {
                   );
                 })}
 
-                {/* Milestones */}
                 {MILESTONES.map((m, i) => {
                   const x = TRAIL_H_PADDING + (m.mile / TRAIL_TOTAL_MILES) * TRAIL_MAP_WIDTH;
                   const passed = state.trailMiles >= m.mile;
                   return (
-                    <View
-                      key={i}
-                      style={[s.milestoneDot, { left: x, transform: [{ translateX: -40 }] }]}
-                    >
-                      {/* Dot on the trail line */}
+                    <View key={i} style={[s.milestoneDot, { left: x, transform: [{ translateX: -40 }] }]}>
                       <View style={[s.milestonePip, {
                         backgroundColor: passed ? colors.trailGold : colors.dirtDark,
                         borderColor: passed ? colors.parchment : colors.dirtLight,
                         opacity: passed ? 1 : 0.5,
                       }]} />
-                      {/* Emoji below */}
                       <Text style={[s.milestoneEmoji, { opacity: passed ? 1 : 0.35 }]}>
                         {m.emoji}
                       </Text>
-                      {/* City name below emoji */}
-                      <Text
-                        style={[s.milestoneName, { color: passed ? colors.parchment : colors.parchmentDark, opacity: passed ? 1 : 0.45 }]}
-                      >
+                      <Text style={[s.milestoneName, { color: passed ? colors.parchment : colors.parchmentDark, opacity: passed ? 1 : 0.45 }]}>
                         {m.name.split(',')[0]}
                       </Text>
                     </View>
                   );
                 })}
 
-                {/* Wagon marker */}
+                {/* Wagon marker — coin icon instead of emoji */}
                 <View style={[s.wagonMarker, { left: wagonX - 14 }]}>
-                  <Text style={s.wagonEmoji}>🪙</Text>
-                  {/* Vertical needle to the trail line */}
+                  <CoinIcon size={28} />
                   <View style={[s.wagonNeedle, { backgroundColor: colors.trailGold }]} />
                 </View>
 
               </View>
             </ScrollView>
 
-            {/* Fade edges */}
             <LinearGradient
               colors={[colors.bgCard, `${colors.bgCard}00`]}
               start={{ x: 0, y: 0 }}
@@ -200,7 +184,6 @@ export default function RewardsScreen() {
               pointerEvents="none"
             />
           </View>
-
         </View>
 
         {/* Filter tabs */}
@@ -285,7 +268,7 @@ export default function RewardsScreen() {
         <View style={s.challengeCard}>
           <Text style={s.cardTitle}>TODAY'S TRAIL CHALLENGE</Text>
           <View style={s.challengeContent}>
-            <Text style={s.challengeIcon}>⚡</Text>
+            <LightningIcon size={32} />
             <View style={s.challengeInfo}>
               <Text style={s.challengeTitle}>Power March</Text>
               <Text style={s.challengeDesc}>
@@ -318,6 +301,11 @@ function makeStyles(colors: ReturnType<typeof useTheme>['colors']) {
   return StyleSheet.create({
     root: { flex: 1 },
     scroll: { padding: 16, paddingTop: 52, gap: 14 },
+    titleRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 8,
+    },
     screenTitle: {
       color: colors.parchment,
       fontSize: 24,
@@ -359,8 +347,6 @@ function makeStyles(colors: ReturnType<typeof useTheme>['colors']) {
       letterSpacing: 0.5,
       marginTop: 2,
     },
-
-    // Trail card
     trailCard: {
       backgroundColor: colors.bgCard,
       borderRadius: 10,
@@ -398,9 +384,6 @@ function makeStyles(colors: ReturnType<typeof useTheme>['colors']) {
       paddingHorizontal: 10,
       paddingVertical: 5,
     },
-    jumpBtnIcon: {
-      fontSize: 13,
-    },
     jumpBtnLabel: {
       fontFamily: 'monospace',
       fontSize: 10,
@@ -416,8 +399,6 @@ function makeStyles(colors: ReturnType<typeof useTheme>['colors']) {
     trailScroll: {
       flex: 1,
     },
-
-    // Visited background glow
     trailVisitedBg: {
       position: 'absolute',
       top: 0,
@@ -425,8 +406,6 @@ function makeStyles(colors: ReturnType<typeof useTheme>['colors']) {
       bottom: 0,
       backgroundColor: `${colors.trailGold}0a`,
     },
-
-    // Trail line
     trailLine: {
       position: 'absolute',
       top: TRAIL_MAP_HEIGHT / 2 + 8,
@@ -443,8 +422,6 @@ function makeStyles(colors: ReturnType<typeof useTheme>['colors']) {
       backgroundColor: colors.trailGold,
       borderRadius: 3,
     },
-
-    // Tick marks
     tickMark: {
       position: 'absolute',
       top: TRAIL_MAP_HEIGHT / 2 + 16,
@@ -459,11 +436,9 @@ function makeStyles(colors: ReturnType<typeof useTheme>['colors']) {
       fontSize: 12,
       marginTop: 2,
     },
-
-    // Milestones — pip sits on the trail line, emoji+name hang below
     milestoneDot: {
       position: 'absolute',
-      top: TRAIL_MAP_HEIGHT / 2 + 5,  // aligns pip centre to trail line
+      top: TRAIL_MAP_HEIGHT / 2 + 5,
       alignItems: 'center',
     },
     milestonePip: {
@@ -482,18 +457,13 @@ function makeStyles(colors: ReturnType<typeof useTheme>['colors']) {
       textAlign: 'center',
       marginTop: 4,
     },
-    milestoneAbove: {},   // unused — everything is below
-    milestoneBelow: {},   // kept for JSX compat, no extra margin needed
-
-    // Wagon
+    milestoneAbove: {},
+    milestoneBelow: {},
     wagonMarker: {
       position: 'absolute',
       top: TRAIL_MAP_HEIGHT / 2 - 50,
       width: 28,
       alignItems: 'center',
-    },
-    wagonEmoji: {
-      fontSize: 30,
     },
     wagonNeedle: {
       width: 2,
@@ -501,8 +471,6 @@ function makeStyles(colors: ReturnType<typeof useTheme>['colors']) {
       borderRadius: 1,
       opacity: 0.6,
     },
-
-    // Fade edges
     fadeLeft: {
       position: 'absolute',
       left: 0,
@@ -517,8 +485,6 @@ function makeStyles(colors: ReturnType<typeof useTheme>['colors']) {
       bottom: 0,
       width: 24,
     },
-
-    // Filter
     filterRow: {
       flexDirection: 'row',
       gap: 8,
@@ -545,8 +511,6 @@ function makeStyles(colors: ReturnType<typeof useTheme>['colors']) {
       color: colors.inkDark,
       fontWeight: 'bold',
     },
-
-    // Badges
     badgeGrid: {
       flexDirection: 'row',
       flexWrap: 'wrap',
@@ -643,8 +607,6 @@ function makeStyles(colors: ReturnType<typeof useTheme>['colors']) {
       fontSize: 9,
       letterSpacing: 1,
     },
-
-    // Challenge
     challengeCard: {
       backgroundColor: colors.bgCard,
       borderRadius: 10,
@@ -658,7 +620,6 @@ function makeStyles(colors: ReturnType<typeof useTheme>['colors']) {
       gap: 12,
       alignItems: 'center',
     },
-    challengeIcon: { fontSize: 32 },
     challengeInfo: {
       flex: 1,
       gap: 6,
