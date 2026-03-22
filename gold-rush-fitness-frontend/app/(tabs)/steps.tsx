@@ -95,7 +95,7 @@ export default function StepsScreen() {
         </View>
 
         {/* Connect health app */}
-        <TouchableOpacity style={s.connectButton}>
+        {/* <TouchableOpacity style={s.connectButton}>
           <Text style={s.connectIcon}>📱</Text>
           <View>
             <Text style={s.connectTitle}>Connect Health App</Text>
@@ -104,7 +104,7 @@ export default function StepsScreen() {
             </Text>
           </View>
           <Text style={s.connectArrow}>→</Text>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
       </ScrollView>
 
       {/* Info modal */}
