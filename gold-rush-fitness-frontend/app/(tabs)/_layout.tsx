@@ -2,6 +2,7 @@
 import { Tabs } from 'expo-router';
 import { View, Text, StyleSheet } from 'react-native';
 import { Colors } from '../../constants/theme';
+import { AppDataProvider } from '../../context/AppDataContext';
 
 function TabIcon({ emoji, label, focused }: { emoji: string; label: string; focused: boolean }) {
   return (
@@ -14,6 +15,7 @@ function TabIcon({ emoji, label, focused }: { emoji: string; label: string; focu
 
 export default function TabLayout() {
   return (
+    <AppDataProvider>
     <Tabs
       screenOptions={{
         headerShown: false,
@@ -69,6 +71,7 @@ export default function TabLayout() {
         }}
       />
     </Tabs>
+    </AppDataProvider>
   );
 }
 

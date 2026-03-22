@@ -14,3 +14,4 @@ class User(Base):
     timezone = Column(String, default="UTC")
     step_goal = Column(Integer, default=10000)
     hydration_goal_ml = Column(Float, default=2500.0)
+    day_on_trail = Column(Integer, default=0)

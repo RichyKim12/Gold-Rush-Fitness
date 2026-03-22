@@ -10,14 +10,25 @@ import {
 import { LinearGradient } from 'expo-linear-gradient';
 import { useTheme } from '../../context/ThemeContext';
 import { REWARDS, MILESTONES, TRAIL_TOTAL_MILES } from '../../constants/theme';
-import { MOCK_STATE } from '../../constants/mockData';
+import { useAppData } from '../../hooks/useAppData';
 
 type Filter = 'all' | 'unlocked' | 'locked';
 
 export default function RewardsScreen() {
   const { colors } = useTheme();
-  const state = MOCK_STATE;
+  const { state, isLoading, error } = useAppData();
   const [filter, setFilter] = useState<Filter>('all');
+
+  if (isLoading || error) {
+    return (
+      <LinearGradient
+        colors={[colors.gradientTop, colors.gradientBottom]}
+        style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}
+      >
+        <Text style={{ color: colors.parchment, fontSize: 14 }}>{error || 'Loading rewards...'}</Text>
+      </LinearGradient>
+    );
+  }
 
   const filtered = REWARDS.filter((r) => {
     if (filter === 'unlocked') return state.unlockedRewards.includes(r.id);
