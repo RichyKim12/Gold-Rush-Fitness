@@ -7,12 +7,23 @@ import {
   ScrollView,
   StyleSheet,
   Switch,
+  Alert,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useTheme, ThemePreference } from '../../context/ThemeContext';
+import { useAuth } from '../../context/AuthContext';
 
 export default function SettingsScreen() {
   const { preference, setPreference, colors, activeTheme } = useTheme();
+  const { logout, displayName } = useAuth();
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+    } catch (e) {
+      console.warn('Logout failed', e);
+    }
+  };
 
   const options: { label: string; value: ThemePreference; icon: string; sub: string }[] = [
     {
@@ -96,6 +107,21 @@ export default function SettingsScreen() {
             <Text style={s.aboutLabel}>Trail Length</Text>
             <Text style={s.aboutValue}>2,170 miles</Text>
           </View>
+        </View>
+
+        {/* Account */}
+        <View style={s.card}>
+          <Text style={s.cardTitle}>ACCOUNT</Text>
+          {displayName ? (
+            <View style={s.aboutRow}>
+              <Text style={s.aboutLabel}>Pioneer</Text>
+              <Text style={s.aboutValue}>{displayName}</Text>
+            </View>
+          ) : null}
+          <TouchableOpacity style={s.logoutButton} onPress={handleLogout} activeOpacity={0.7}>
+            <Text style={s.logoutIcon}>🚪</Text>
+            <Text style={s.logoutText}>Leave the Trail (Log Out)</Text>
+          </TouchableOpacity>
         </View>
 
         <View style={s.tipBox}>
@@ -234,6 +260,26 @@ function makeStyles(colors: ReturnType<typeof import('../../context/ThemeContext
       fontSize: 11,
       lineHeight: 17,
       fontStyle: 'italic',
+    },
+    logoutButton: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 12,
+      padding: 14,
+      borderRadius: 8,
+      backgroundColor: 'rgba(200, 50, 50, 0.15)',
+      borderWidth: 1,
+      borderColor: 'rgba(200, 50, 50, 0.4)',
+      marginTop: 8,
+    },
+    logoutIcon: {
+      fontSize: 20,
+    },
+    logoutText: {
+      color: '#e05555',
+      fontFamily: 'monospace',
+      fontSize: 12,
+      fontWeight: 'bold',
     },
   });
 }

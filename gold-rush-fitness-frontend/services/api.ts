@@ -4,7 +4,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 // ─── Configuration ───────────────────────────────────────────────────────────
 // In development, point to your local FastAPI server.
 // For physical devices, replace localhost with your machine's IP.
-const BASE_URL = process.env.EXPO_PUBLIC_API_URL || 'http://localhost:8000';
+const BASE_URL = process.env.EXPO_PUBLIC_API_URL || 'http://172.25.147.19:8000';
 
 const AUTH_TOKEN_KEY = 'auth_token';
 const USER_ID_KEY = 'user_id';
