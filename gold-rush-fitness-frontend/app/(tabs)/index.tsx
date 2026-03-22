@@ -13,11 +13,10 @@ import { useTheme } from '../../context/ThemeContext';
 import { MILESTONES, TRAIL_TOTAL_MILES } from '../../constants/theme';
 import { MOCK_STATE } from '../../constants/mockData';
 import WagonScene from '../../components/WagonScene';
-import HealthBar from '../../components/HealthBar';
 import StepRing from '../../components/StepRing';
 import WeekHeatmap from '../../components/WeekHeatmap';
 import { useRouter } from 'expo-router';
-import { TrailIcon, StreakIcon, PinIcon, TrophyIcon } from '../../components/PixelIcons';
+import { TrailIcon, StreakIcon, PinIcon, TrophyIcon, DehydrationIcon, HealthIcon } from '../../components/PixelIcons';
 
 export default function HomeScreen() {
   const router = useRouter();
@@ -28,6 +27,13 @@ export default function HomeScreen() {
   const nextMilestone = MILESTONES.find((m) => m.mile > state.trailMiles) || MILESTONES[MILESTONES.length - 1];
   const prevMilestone = [...MILESTONES].reverse().find((m) => m.mile <= state.trailMiles) || MILESTONES[0];
   const milesFromNext = nextMilestone.mile - state.trailMiles;
+
+  // Mock hydration data — replace with real state later
+  const hydrationDaysMissed: number = 1;
+  const hydrationStreak = 5;
+  const hydrationPct = Math.max(0, Math.min(1, 1 - hydrationDaysMissed / 7));
+  const hydrationRisk = hydrationDaysMissed === 0 ? 'None' : hydrationDaysMissed <= 1 ? 'Low' : hydrationDaysMissed <= 3 ? 'Medium' : hydrationDaysMissed <= 6 ? 'High' : 'Critical';
+  const hydrationColor = hydrationRisk === 'None' ? colors.healthFull : hydrationRisk === 'Low' ? colors.healthGood : hydrationRisk === 'Medium' ? colors.healthLow : colors.healthEmpty;
 
   const s = makeStyles(colors);
 
@@ -93,27 +99,36 @@ export default function HomeScreen() {
           </View>
         </View>
 
-        {/* PARTY STATUS STRIP */}
-        <View style={s.statusStrip}>
-          <View style={s.statusItem}>
-            <Text style={s.statusIcon}>🍖</Text>
-            <Text style={s.statusLabel}>Rations</Text>
-            <Text style={s.statusValue}>{state.rations}</Text>
+        {/* VITALITY BAR */}
+        <TouchableOpacity style={s.vitalityCard} onPress={() => router.push('/health')} activeOpacity={0.85}>
+          <View style={s.vitalityHeader}>
+            <View style={s.vitalityTitleRow}>
+              <HealthIcon size={14} />
+              <Text style={s.vitalityTitle}>Overall Vitality</Text>
+            </View>
+            <View style={s.vitalityScoreRow}>
+              <Text style={[s.vitalityScoreNum, { color: colors.healthFull }]}>{state.healthScore}</Text>
+              <Text style={s.vitalityScoreMax}> / 100</Text>
+            </View>
           </View>
-          <View style={s.statusItem}>
-            <Text style={s.statusIcon}>🐂</Text>
-            <Text style={s.statusLabel}>Pace</Text>
-            <Text style={s.statusValue}>{state.pace}</Text>
+          <View style={s.vitalityBarTrack}>
+            <View style={[s.vitalityBarFill, {
+              width: `${state.healthScore}%`,
+              backgroundColor: state.healthScore >= 70 ? colors.healthFull : state.healthScore >= 40 ? colors.healthGood : colors.healthLow,
+            }]} />
           </View>
-          <View style={s.statusItem}>
-            <Text style={s.statusIcon}>👨‍👩‍👧‍👦</Text>
-            <Text style={s.statusLabel}>Party</Text>
-            <Text style={s.statusValue}>{state.partySize} members</Text>
+          <View style={s.vitalityFooter}>
+            <Text style={s.vitalityHint}>
+              {state.healthScore >= 70 ? '💪 Party is healthy' : state.healthScore >= 40 ? '⚠️ Health declining' : '🚨 Critical condition'}
+            </Text>
+            <Text style={s.vitalityLink}>Full Report →</Text>
           </View>
-        </View>
+        </TouchableOpacity>
 
-        {/* STEPS + HEALTH ROW */}
+        {/* STEPS + HYDRATION ROW */}
         <View style={s.statsRow}>
+          
+          {/* Steps card */}
           <View style={s.stepsCard}>
             <Text style={s.cardTitle}>TODAY'S MARCH</Text>
             <View style={{ alignItems: 'center' }}>
@@ -127,18 +142,45 @@ export default function HomeScreen() {
             </TouchableOpacity>
           </View>
 
-          <View style={s.healthCard}>
-            <Text style={s.cardTitle}>PARTY HEALTH</Text>
-            <HealthBar score={state.healthScore} label="Your Vitality" showDetails />
-            <HealthBar score={Math.max(0, state.healthScore - 8)} label="Oxen Strength" />
-            <HealthBar score={Math.max(0, state.healthScore - 15)} label="Wagon Condition" />
-            <TouchableOpacity
-              style={s.logButton}
-              onPress={() => router.push('/health')}
-            >
-              <Text style={s.logButtonText}>Full Report →</Text>
+          {/* Hydration card */}
+          <TouchableOpacity style={s.hydrationCard} onPress={() => router.push('/health')} activeOpacity={0.85}>
+            <View style={s.hydrationHeader}>
+              <DehydrationIcon size={18} />
+              <Text style={s.cardTitle}>HYDRATION</Text>
+            </View>
+
+            <View style={[s.riskBadge, { backgroundColor: `${hydrationColor}22`, borderColor: hydrationColor }]}>
+              <Text style={[s.riskText, { color: hydrationColor }]}>{hydrationRisk} Risk</Text>
+            </View>
+
+            <View style={s.hydrationBarTrack}>
+              <View style={[s.hydrationBarFill, { width: `${hydrationPct * 100}%`, backgroundColor: hydrationColor }]} />
+            </View>
+
+            <View style={s.hydrationStats}>
+              <View style={s.hydrationStat}>
+                <Text style={[s.hydrationStatValue, { color: colors.parchment }]}>{hydrationStreak}</Text>
+                <Text style={s.hydrationStatLabel}>Day Streak</Text>
+              </View>
+              <View style={s.hydrationDivider} />
+              <View style={s.hydrationStat}>
+                <Text style={[s.hydrationStatValue, { color: hydrationColor }]}>{hydrationDaysMissed}</Text>
+                <Text style={s.hydrationStatLabel}>Days Missed</Text>
+              </View>
+            </View>
+
+            {hydrationDaysMissed >= 2 && (
+              <View style={[s.hydrationWarning, { borderColor: hydrationColor }]}>
+                <Text style={[s.hydrationWarningText, { color: hydrationColor }]}>
+                  {7 - hydrationDaysMissed}d until Critical
+                </Text>
+              </View>
+            )}
+
+            <TouchableOpacity style={s.logButton} onPress={() => router.push('/health')}>
+              <Text style={s.logButtonText}>Log Water →</Text>
             </TouchableOpacity>
-          </View>
+          </TouchableOpacity>
         </View>
 
         {/* WEEK HEATMAP */}
@@ -253,33 +295,74 @@ function makeStyles(colors: ReturnType<typeof useTheme>['colors']) {
       alignItems: 'center',
       gap: 3,
     },
-    statusStrip: {
-      flexDirection: 'row',
+
+    // Vitality card
+    vitalityCard: {
       backgroundColor: colors.bgCard,
-      borderRadius: 8,
+      borderRadius: 10,
+      padding: 14,
+      gap: 10,
       borderWidth: 1,
       borderColor: colors.border,
+    },
+    vitalityHeader: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+    },
+    vitalityTitleRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 6,
+    },
+    vitalityTitle: {
+      color: colors.trailGold,
+      fontSize: 10,
+      textTransform: 'uppercase',
+      letterSpacing: 2,
+    },
+    vitalityScoreRow: {
+      flexDirection: 'row',
+      alignItems: 'flex-end',
+    },
+    vitalityScoreNum: {
+      fontSize: 22,
+      fontWeight: 'bold',
+      fontFamily: 'monospace',
+    },
+    vitalityScoreMax: {
+      color: colors.dirtLight,
+      fontSize: 12,
+      fontFamily: 'monospace',
+      marginBottom: 1,
+    },
+    vitalityBarTrack: {
+      height: 8,
+      backgroundColor: colors.bgCardLight,
+      borderRadius: 4,
       overflow: 'hidden',
     },
-    statusItem: {
-      flex: 1,
+    vitalityBarFill: {
+      height: '100%',
+      borderRadius: 4,
+    },
+    vitalityFooter: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
       alignItems: 'center',
-      padding: 10,
-      borderRightWidth: 1,
-      borderRightColor: colors.border,
     },
-    statusIcon: { fontSize: 18, marginBottom: 2 },
-    statusLabel: {
+    vitalityHint: {
       color: colors.dirtLight,
-      fontSize: 9,
-      textTransform: 'uppercase',
-    },
-    statusValue: {
-      color: colors.parchment,
       fontSize: 10,
-      fontWeight: 'bold',
-      marginTop: 2,
+      fontFamily: 'monospace',
     },
+    vitalityLink: {
+      color: colors.trailGold,
+      fontSize: 10,
+      fontFamily: 'monospace',
+    },
+
+    // Stats row
     statsRow: { flexDirection: 'row', gap: 10 },
     stepsCard: {
       flex: 1,
@@ -291,14 +374,81 @@ function makeStyles(colors: ReturnType<typeof useTheme>['colors']) {
       gap: 8,
       justifyContent: 'space-between',
     },
-    healthCard: {
-      flex: 1.4,
+    hydrationCard: {
+      flex: 1,
       backgroundColor: colors.bgCard,
       borderRadius: 10,
       padding: 12,
       borderWidth: 1,
       borderColor: colors.border,
-      gap: 10,
+      gap: 8,
+      justifyContent: 'space-between',
+    },
+    hydrationHeader: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 6,
+    },
+    riskBadge: {
+      alignSelf: 'flex-start',
+      paddingHorizontal: 8,
+      paddingVertical: 3,
+      borderRadius: 4,
+      borderWidth: 1,
+    },
+    riskText: {
+      fontFamily: 'monospace',
+      fontSize: 10,
+      fontWeight: 'bold',
+    },
+    hydrationBarTrack: {
+      height: 6,
+      backgroundColor: colors.bgCardLight,
+      borderRadius: 3,
+      overflow: 'hidden',
+    },
+    hydrationBarFill: {
+      height: '100%',
+      borderRadius: 3,
+    },
+    hydrationStats: {
+      flexDirection: 'row',
+      alignItems: 'center',
+    },
+    hydrationStat: {
+      flex: 1,
+      alignItems: 'center',
+    },
+    hydrationDivider: {
+      width: 1,
+      height: 24,
+      backgroundColor: colors.border,
+    },
+    hydrationStatValue: {
+      fontFamily: 'monospace',
+      fontSize: 18,
+      fontWeight: 'bold',
+    },
+    hydrationStatLabel: {
+      color: colors.dirtLight,
+      fontFamily: 'monospace',
+      fontSize: 8,
+      textTransform: 'uppercase',
+      letterSpacing: 0.5,
+      marginTop: 2,
+      textAlign: 'center',
+    },
+    hydrationWarning: {
+      borderWidth: 1,
+      borderRadius: 4,
+      paddingHorizontal: 8,
+      paddingVertical: 4,
+    },
+    hydrationWarningText: {
+      fontFamily: 'monospace',
+      fontSize: 9,
+      fontWeight: 'bold',
+      textAlign: 'center',
     },
     cardTitle: {
       color: colors.trailGold,

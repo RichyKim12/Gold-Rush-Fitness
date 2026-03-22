@@ -363,3 +363,197 @@ export function LightningIcon({ size = 18 }: { size?: number }) {
     </Svg>
   );
 }
+
+
+// ─── Reward Badge Icons ───────────────────────────────────────────────────────
+
+// Trail Blazer — sneaker/boot with flame
+export function RewardTrailBlazer({ size = 28 }: { size?: number }) {
+  const pixels: PixelList = [
+    // boot
+    [1,0,'#A0522D'],[2,0,'#CD853F'],[3,0,'#A0522D'],
+    [1,1,'#A0522D'],[2,1,'#CD853F'],[3,1,'#F5DEB3'],[4,1,'#A0522D'],
+    [1,2,'#A0522D'],[2,2,'#A0522D'],[3,2,'#A0522D'],[4,2,'#A0522D'],
+    [0,3,'#D2691E'],[1,3,'#D2691E'],[2,3,'#A0522D'],[3,3,'#A0522D'],[4,3,'#6B2F00'],
+    [0,4,'#6B2F00'],[1,4,'#6B2F00'],[2,4,'#6B2F00'],[3,4,'#6B2F00'],[4,4,'#3B1A08'],
+    // flame beside boot
+    [5,1,'#D4A017'],[6,1,'#f0c040'],
+    [5,2,'#e85d04'],[6,2,'#f48c06'],[7,2,'#D4A017'],
+    [5,3,'#cc2200'],[6,3,'#e85d04'],[7,3,'#e85d04'],
+    [6,4,'#cc2200'],
+  ];
+  return <Svg width={size} height={size} viewBox="0 0 24 15">{pixels.map(([c,r,color],i)=>px(c,r,color,i))}</Svg>;
+}
+
+// Fort Kearny — castle tower
+export function RewardFortKearny({ size = 28 }: { size?: number }) {
+  const w = '#d0d0d0'; const g = '#888'; const k = '#333'; const y = '#D4A017';
+  const pixels: PixelList = [
+    [0,0,w],[2,0,w],[4,0,w],[6,0,w],
+    [0,1,w],[1,1,w],[2,1,w],[3,1,w],[4,1,w],[5,1,w],[6,1,w],
+    [0,2,w],[1,2,k],[2,2,w],[3,2,y],[4,2,w],[5,2,k],[6,2,w],
+    [0,3,w],[1,3,w],[2,3,w],[3,3,y],[4,3,w],[5,3,w],[6,3,w],
+    [0,4,g],[1,4,g],[2,4,g],[3,4,w],[4,4,g],[5,4,g],[6,4,g],
+    [1,5,g],[2,5,g],[3,5,k],[4,5,g],[5,5,g],
+    [2,6,g],[3,6,g],[4,6,g],
+  ];
+  return <Svg width={size} height={size} viewBox="0 0 21 21">{pixels.map(([c,r,color],i)=>px(c,r,color,i))}</Svg>;
+}
+
+// Chimney Rock — tall spire
+export function RewardChimneyRock({ size = 28 }: { size?: number }) {
+  const r = '#8B4513'; const l = '#CD853F'; const k = '#3B1A08'; const s = '#87CEEB';
+  const pixels: PixelList = [
+    [3,0,s],[4,0,k],
+    [3,1,l],[4,1,k],
+    [3,2,r],[4,2,k],
+    [3,3,r],[4,3,k],
+    [2,4,k],[3,4,l],[4,4,r],[5,4,k],
+    [2,5,r],[3,5,r],[4,5,r],[5,5,k],
+    [1,6,k],[2,6,r],[3,6,l],[4,6,r],[5,6,r],[6,6,k],
+    [1,7,r],[2,7,r],[3,7,r],[4,7,r],[5,7,r],[6,7,k],
+    [0,8,k],[1,8,r],[2,8,r],[3,8,r],[4,8,r],[5,8,r],[6,8,k],
+  ];
+  return <Svg width={size} height={size} viewBox="0 0 21 27">{pixels.map(([c,r,color],i)=>px(c,r,color,i))}</Svg>;
+}
+
+// Halfway Hero — mountain with flag
+export function RewardHalfway({ size = 28 }: { size?: number }) {
+  const b = '#6b9db8'; const l = '#8fbcd4'; const k = '#333'; const f = '#cc2222'; const p = '#f5deb3';
+  const pixels: PixelList = [
+    // flag
+    [4,0,k],[5,0,f],[6,0,f],
+    [4,1,k],[5,1,f],
+    [4,2,k],
+    // mountain left
+    [3,3,k],[4,3,b],
+    [2,4,k],[3,4,b],[4,4,l],[5,4,k],
+    [1,5,k],[2,5,b],[3,5,l],[4,5,b],[5,5,b],[6,5,k],
+    [0,6,k],[1,6,b],[2,6,b],[3,6,b],[4,6,b],[5,6,b],[6,6,b],[7,6,k],
+    // snow cap
+    [3,3,p],[4,3,p],[5,3,k],
+  ];
+  return <Svg width={size} height={size} viewBox="0 0 24 21">{pixels.map(([c,r,color],i)=>px(c,r,color,i))}</Svg>;
+}
+
+// Oregon Bound — pine tree
+export function RewardOregonBound({ size = 28 }: { size?: number }) {
+  const d = '#1a5c1a'; const l = '#2d8c2d'; const t = '#6B2F00'; const k = '#0d3d0d';
+  const pixels: PixelList = [
+    [3,0,k],[4,0,l],[5,0,k],
+    [2,1,k],[3,1,l],[4,1,d],[5,1,l],[6,1,k],
+    [2,2,k],[3,2,d],[4,2,l],[5,2,d],[6,2,k],
+    [1,3,k],[2,3,l],[3,3,d],[4,3,l],[5,3,d],[6,3,l],[7,3,k],
+    [1,4,k],[2,4,d],[3,4,l],[4,4,d],[5,4,l],[6,4,d],[7,4,k],
+    [0,5,k],[1,5,l],[2,5,d],[3,5,l],[4,5,d],[5,5,l],[6,5,d],[7,5,l],[8,5,k],
+    [3,6,k],[4,6,t],[5,6,k],
+    [3,7,t],[4,7,t],[5,7,t],
+  ];
+  return <Svg width={size} height={size} viewBox="0 0 27 24">{pixels.map(([c,r,color],i)=>px(c,r,color,i))}</Svg>;
+}
+
+// Oregon City — celebration star burst
+export function RewardOregonCity({ size = 28 }: { size?: number }) {
+  const y = '#f0c040'; const o = '#e85d04'; const w = '#ffffff'; const k = '#7a5000';
+  const pixels: PixelList = [
+    [3,0,y],[4,0,y],
+    [0,1,y],[1,1,y],[3,1,w],[4,1,w],[6,1,y],[7,1,y],
+    [1,2,y],[2,2,y],[3,2,y],[4,2,y],[5,2,y],[6,2,y],
+    [0,3,y],[1,3,y],[2,3,w],[3,3,y],[4,3,y],[5,3,w],[6,3,y],[7,3,y],
+    [1,4,y],[2,4,y],[3,4,y],[4,4,y],[5,4,y],[6,4,y],
+    [0,5,y],[1,5,y],[3,5,o],[4,5,o],[6,5,y],[7,5,y],
+    [3,6,y],[4,6,y],
+  ];
+  return <Svg width={size} height={size} viewBox="0 0 24 21">{pixels.map(([c,r,color],i)=>px(c,r,color,i))}</Svg>;
+}
+
+// Streak 3 — small flame
+export function RewardStreak3({ size = 28 }: { size?: number }) {
+  const pixels: PixelList = [
+    [2,0,'#D4A017'],
+    [1,1,'#D4A017'],[2,1,'#f0c040'],[3,1,'#D4A017'],
+    [0,2,'#e85d04'],[1,2,'#f48c06'],[2,2,'#f0c040'],[3,2,'#f48c06'],[4,2,'#e85d04'],
+    [0,3,'#e85d04'],[1,3,'#f48c06'],[2,3,'#f48c06'],[3,3,'#f48c06'],[4,3,'#e85d04'],
+    [1,4,'#cc2200'],[2,4,'#e85d04'],[3,4,'#cc2200'],
+    [2,5,'#cc2200'],
+  ];
+  return <Svg width={size} height={size} viewBox="0 0 15 18">{pixels.map(([c,r,color],i)=>px(c,r,color,i))}</Svg>;
+}
+
+// Streak 7 — axe
+export function RewardStreak7({ size = 28 }: { size?: number }) {
+  const k = '#3B1A08'; const s = '#aaaaaa'; const l = '#dddddd'; const t = '#8B4513';
+  const pixels: PixelList = [
+    [3,0,s],[4,0,s],[5,0,k],
+    [2,1,s],[3,1,l],[4,1,s],[5,1,s],[6,1,k],
+    [1,2,k],[2,2,s],[3,2,l],[4,2,s],[5,2,k],
+    [2,3,k],[3,3,s],[4,3,k],
+    [3,4,t],[4,4,k],
+    [3,5,t],
+    [3,6,t],[4,6,k],
+    [2,7,k],[3,7,t],[4,7,t],[5,7,k],
+  ];
+  return <Svg width={size} height={size} viewBox="0 0 21 24">{pixels.map(([c,r,color],i)=>px(c,r,color,i))}</Svg>;
+}
+
+// Streak 14 — crossed swords
+export function RewardStreak14({ size = 28 }: { size?: number }) {
+  const s = '#c0c0c0'; const l = '#ffffff'; const k = '#555'; const g = '#D4A017';
+  const pixels: PixelList = [
+    [0,0,s],[6,0,s],
+    [0,1,s],[1,1,l],[5,1,l],[6,1,s],
+    [1,2,s],[2,2,l],[4,2,l],[5,2,s],
+    [2,3,s],[3,3,l],[4,3,s],
+    [3,4,g],[4,4,g],
+    [2,5,s],[3,5,l],[4,5,s],
+    [1,6,s],[2,6,l],[4,6,l],[5,6,s],
+    [0,7,s],[1,7,l],[5,7,l],[6,7,s],
+    [0,8,s],[6,8,s],
+  ];
+  return <Svg width={size} height={size} viewBox="0 0 21 27">{pixels.map(([c,r,color],i)=>px(c,r,color,i))}</Svg>;
+}
+
+// Streak 30 — shield
+export function RewardStreak30({ size = 28 }: { size?: number }) {
+  const b = '#1a3a8c'; const l = '#4169e1'; const k = '#0d1f5c'; const g = '#D4A017';
+  const pixels: PixelList = [
+    [0,0,k],[1,0,b],[2,0,b],[3,0,b],[4,0,b],[5,0,b],[6,0,k],
+    [0,1,b],[1,1,l],[2,1,l],[3,1,g],[4,1,l],[5,1,l],[6,1,b],
+    [0,2,b],[1,2,l],[2,2,g],[3,2,g],[4,2,g],[5,2,l],[6,2,b],
+    [0,3,b],[1,3,l],[2,3,l],[3,3,g],[4,3,l],[5,3,l],[6,3,b],
+    [0,4,b],[1,4,l],[2,4,l],[3,4,l],[4,4,l],[5,4,l],[6,4,b],
+    [1,5,b],[2,5,b],[3,5,l],[4,5,b],[5,5,b],
+    [2,6,k],[3,6,b],[4,6,k],
+    [3,7,k],
+  ];
+  return <Svg width={size} height={size} viewBox="0 0 21 24">{pixels.map(([c,r,color],i)=>px(c,r,color,i))}</Svg>;
+}
+
+// Streak 50 — crown
+export function RewardStreak50({ size = 28 }: { size?: number }) {
+  const g = '#D4A017'; const l = '#f0c040'; const k = '#7a5000'; const r = '#cc2222'; const b = '#4169e1';
+  const pixels: PixelList = [
+    [0,0,k],[3,0,k],[6,0,k],
+    [0,1,l],[1,1,l],[2,1,g],[3,1,l],[4,1,g],[5,1,l],[6,1,l],
+    [0,2,l],[1,2,g],[2,2,r],[3,2,g],[4,2,b],[5,2,g],[6,2,l],
+    [0,3,g],[1,3,g],[2,3,g],[3,3,g],[4,3,g],[5,3,g],[6,3,g],
+    [0,4,k],[1,4,g],[2,4,l],[3,4,g],[4,4,l],[5,4,g],[6,4,k],
+    [0,5,k],[1,5,k],[2,5,k],[3,5,k],[4,5,k],[5,5,k],[6,5,k],
+  ];
+  return <Svg width={size} height={size} viewBox="0 0 21 18">{pixels.map(([c,r,color],i)=>px(c,r,color,i))}</Svg>;
+}
+
+// Overachiever — gold star
+export function RewardOverachiever({ size = 28 }: { size?: number }) {
+  const g = '#D4A017'; const l = '#f0c040'; const h = '#fffacc'; const k = '#7a5000';
+  const pixels: PixelList = [
+    [3,0,k],[4,0,l],[5,0,k],
+    [0,1,k],[1,1,l],[2,1,l],[3,1,l],[4,1,h],[5,1,l],[6,1,l],[7,1,k],
+    [1,2,k],[2,2,l],[3,2,l],[4,2,l],[5,2,l],[6,2,k],
+    [0,3,k],[1,3,g],[2,3,l],[3,3,l],[4,3,l],[5,3,l],[6,3,g],[7,3,k],
+    [0,4,l],[1,4,l],[2,4,k],[3,4,g],[4,4,g],[5,4,k],[6,4,l],[7,4,l],
+    [0,5,k],[1,5,l],[2,5,l],[3,5,k],[4,5,k],[5,5,l],[6,5,l],[7,5,k],
+    [1,6,k],[2,6,l],[3,6,l],[4,6,l],[5,6,l],[6,6,k],
+  ];
+  return <Svg width={size} height={size} viewBox="0 0 24 21">{pixels.map(([c,r,color],i)=>px(c,r,color,i))}</Svg>;
+}
