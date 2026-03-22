@@ -25,22 +25,23 @@ export default function RewardsScreen() {
   const state = MOCK_STATE;
   const [filter, setFilter] = useState<Filter>('all');
   const trailScrollRef = useRef<ScrollView>(null);
-
-  const filtered = REWARDS.filter((r) => {
-    if (filter === 'unlocked') return state.unlockedRewards.includes(r.id);
-    if (filter === 'locked') return !state.unlockedRewards.includes(r.id);
-    return true;
-  });
+  const [scrollViewWidth, setScrollViewWidth] = useState(300);
 
   const progressPercent = (state.trailMiles / TRAIL_TOTAL_MILES) * 100;
   const wagonX = TRAIL_H_PADDING + (progressPercent / 100) * TRAIL_MAP_WIDTH;
 
   const scrollToWagon = (animated = true) => {
     trailScrollRef.current?.scrollTo({
-      x: Math.max(0, wagonX - 140),
+      x: Math.max(0, wagonX - scrollViewWidth / 2),
       animated,
     });
   };
+
+  const filtered = REWARDS.filter((r) => {
+    if (filter === 'unlocked') return state.unlockedRewards.includes(r.id);
+    if (filter === 'locked') return !state.unlockedRewards.includes(r.id);
+    return true;
+  });
 
   // Scroll to wagon on mount (no animation so it snaps immediately)
   useEffect(() => {
@@ -102,7 +103,10 @@ export default function RewardsScreen() {
           </View>
 
           {/* Scrollable map */}
-          <View style={s.trailScrollWrapper}>
+          <View
+            style={s.trailScrollWrapper}
+            onLayout={(e) => setScrollViewWidth(e.nativeEvent.layout.width)}
+          >
             <ScrollView
               ref={trailScrollRef}
               horizontal
@@ -470,7 +474,7 @@ function makeStyles(colors: ReturnType<typeof useTheme>['colors']) {
     },
     milestoneEmoji: {
       fontSize: 28,
-      marginTop: 22,
+      marginTop: 10,
     },
     milestoneName: {
       fontFamily: 'monospace',
@@ -595,7 +599,7 @@ function makeStyles(colors: ReturnType<typeof useTheme>['colors']) {
     badgeDesc: {
       color: colors.dirtLight,
       fontFamily: 'monospace',
-      fontSize: 13,
+      fontSize: 8,
       textAlign: 'center',
       lineHeight: 12,
     },
@@ -608,7 +612,7 @@ function makeStyles(colors: ReturnType<typeof useTheme>['colors']) {
     conditionText: {
       color: colors.trailGold,
       fontFamily: 'monospace',
-      fontSize: 12,
+      fontSize: 8,
     },
     badgeProgress: {
       flexDirection: 'row',
@@ -668,7 +672,7 @@ function makeStyles(colors: ReturnType<typeof useTheme>['colors']) {
     challengeDesc: {
       color: colors.dirtLight,
       fontFamily: 'monospace',
-      fontSize: 12,
+      fontSize: 10,
       lineHeight: 14,
     },
     challengeProgress: { gap: 3 },
