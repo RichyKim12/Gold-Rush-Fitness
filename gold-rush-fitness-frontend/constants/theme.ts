@@ -26,20 +26,13 @@ export const MILESTONES = [
 ];
 
 export const REWARDS = [
+  // Step Milestones
   {
     id: 'first_steps',
     title: 'Trail Blazer',
     description: 'Completed your first day on the trail',
     icon: '👟',
     condition: 'Complete 1 day',
-    miles: 0,
-  },
-  {
-    id: 'week_streak',
-    title: 'Iron Settler',
-    description: '7-day step goal streak',
-    icon: '🪓',
-    condition: '7-day streak',
     miles: 0,
   },
   {
@@ -82,4 +75,57 @@ export const REWARDS = [
     condition: 'Reach mile 2170',
     miles: 2170,
   },
+  // Streak
+  {
+    id: 'streak_3',
+    title: 'Getting Warmed Up',
+    description: 'Three days on the trail without stopping',
+    icon: '🔥',
+    condition: '3-day streak',
+    miles: 0,
+  },
+  {
+    id: 'streak_7',
+    title: 'Iron Settler',
+    description: '7-day step goal streak',
+    icon: '🪓',
+    condition: '7-day streak',
+    miles: 0,
+  },
+  {
+    id: 'streak_14',
+    title: 'Fortnight Frontiersman',
+    description: 'Two full weeks of daily marching',
+    icon: '⚔️',
+    condition: '14-day streak',
+    miles: 0,
+  },
+  {
+    id: 'streak_30',
+    title: 'Iron Will',
+    description: 'A full month of hitting your goal every day',
+    icon: '🛡️',
+    condition: '30-day streak',
+    miles: 0,
+  },
+  {
+    id: 'streak_50',
+    title: 'Unstoppable',
+    description: '50 days straight — nothing can stop this wagon',
+    icon: '👑',
+    condition: '50-day streak',
+    miles: 0,
+  },
+
+  // Challenge Badges
+  {
+    id: 'overachiever',
+    title: 'Overachiever',
+    description: 'Crushed your daily goal by 50% or more',
+    icon: '⭐',
+    condition: 'Exceed goal by 50%',
+    miles: 0,
+  },
+
+
 ];

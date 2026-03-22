@@ -105,17 +105,6 @@ export default function StepsScreen() {
           </View>
         </View>
 
-        {/* Connect health app */}
-        <TouchableOpacity style={s.connectButton}>
-          <Text style={s.connectIcon}>📱</Text>
-          <View>
-            <Text style={s.connectTitle}>Connect Health App</Text>
-            <Text style={s.connectSub}>
-              Sync real steps from Apple Health or Google Fit
-            </Text>
-          </View>
-          <Text style={s.connectArrow}>→</Text>
-        </TouchableOpacity>
       </ScrollView>
 
       {/* Info modal */}
@@ -221,7 +210,9 @@ function makeStyles(colors: ReturnType<typeof useTheme>['colors']) {
       width: '100%',
     },
     statBox: {
-      width: '47%',
+      flexBasis: '47%',
+      flexGrow: 1,
+      flexShrink: 1,
       backgroundColor: colors.bgCardLight,
       borderRadius: 8,
       padding: 10,
@@ -320,7 +311,6 @@ function makeStyles(colors: ReturnType<typeof useTheme>['colors']) {
       fontSize: 20,
       marginLeft: 'auto',
     },
-    // Modal
     modalOverlay: {
       flex: 1,
       backgroundColor: 'rgba(0,0,0,0.6)',
