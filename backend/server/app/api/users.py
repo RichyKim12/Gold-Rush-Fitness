@@ -30,6 +30,21 @@ class TodayGoalProgress(BaseModel):
     tierDetails: List[TierDetailResponse]
 
 
+class SyncRequest(BaseModel):
+    log_date: str
+    steps: int
+    hydration_ml: float
+    source: str = "manual"
+
+
+class SyncResponse(BaseModel):
+    status: str
+    steps: int
+    hydration_ml: float
+    vitality_change: int
+    new_vitality: int
+
+
 class DashboardResponse(BaseModel):
     playerName: str
     partySize: int
@@ -144,3 +159,62 @@ def get_user_stats(
         "vitality": user.vitality,
         "vitalityMax": user.vitality_max,
     }
+
+
+@router.post("/sync", response_model=SyncResponse)
+def sync_health_data(
+    body: SyncRequest,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    user = db.query(User).filter(User.id == current_user.id).first()
+    log_date = date.fromisoformat(body.log_date)
+    
+    today_log = db.query(DailyLog).filter(
+        DailyLog.user_id == current_user.id,
+        DailyLog.log_date == log_date
+    ).first()
+    
+    if today_log:
+        today_log.steps = body.steps
+        today_log.hydration_ml = body.hydration_ml
+        today_log.source = body.source
+    else:
+        today_log = DailyLog(
+            user_id=current_user.id,
+            log_date=log_date,
+            steps=body.steps,
+            hydration_ml=body.hydration_ml,
+            source=body.source,
+        )
+        db.add(today_log)
+        db.flush()
+    
+    stats = db.query(UserStats).filter(UserStats.user_id == current_user.id).first()
+    
+    if stats:
+        stats.total_steps += body.steps
+        stats.trail_miles = stats.total_steps // 2000
+    else:
+        stats = UserStats(
+            user_id=current_user.id,
+            trail_miles=body.steps // 2000,
+            current_streak=0,
+            longest_streak=0,
+            total_steps=body.steps,
+            health_score=100,
+            rations="Filling",
+            pace="Steady",
+            day_on_trail=0,
+        )
+        db.add(stats)
+    
+    db.commit()
+    
+    return SyncResponse(
+        status="ok",
+        steps=body.steps,
+        hydration_ml=body.hydration_ml,
+        vitality_change=0,
+        new_vitality=user.vitality if user.vitality else 100,
+    )
