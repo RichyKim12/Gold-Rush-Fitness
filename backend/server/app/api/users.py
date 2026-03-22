@@ -191,24 +191,59 @@ def sync_health_data(
         db.flush()
     
     stats = db.query(UserStats).filter(UserStats.user_id == current_user.id).first()
-    
+
+    # Recalculate total_steps from ALL daily logs (avoids double-counting on repeated syncs)
+    from sqlalchemy import func as sqlfunc
+    total_steps_result = db.query(sqlfunc.sum(DailyLog.steps)).filter(
+        DailyLog.user_id == current_user.id
+    ).scalar()
+    real_total = int(total_steps_result or 0)
+
+    # Calculate streak based on consecutive days meeting tier 1 (3000 steps)
+    goal_met_today = GoalService.calculate_progress(body.steps).completed_tiers >= 1
+
+    yesterday = log_date - timedelta(days=1)
+    yesterday_log = db.query(DailyLog).filter(
+        DailyLog.user_id == current_user.id,
+        DailyLog.log_date == yesterday
+    ).first()
+    goal_met_yesterday = yesterday_log and GoalService.calculate_progress(yesterday_log.steps).completed_tiers >= 1
+
     if stats:
-        stats.total_steps += body.steps
-        stats.trail_miles = stats.total_steps // 2000
+        stats.total_steps = real_total
+        stats.trail_miles = real_total // 2000
+
+        # Update streak
+        if goal_met_today:
+            if goal_met_yesterday:
+                stats.current_streak = (stats.current_streak or 0) + 1
+            else:
+                stats.current_streak = 1
+        else:
+            stats.current_streak = 0
+
+        if stats.current_streak > (stats.longest_streak or 0):
+            stats.longest_streak = stats.current_streak
+
+        # Increment day_on_trail once per unique day
+        existing_log_count = db.query(DailyLog).filter(
+            DailyLog.user_id == current_user.id
+        ).count()
+        stats.day_on_trail = existing_log_count
     else:
         stats = UserStats(
             user_id=current_user.id,
             trail_miles=body.steps // 2000,
-            current_streak=0,
-            longest_streak=0,
+            current_streak=1 if goal_met_today else 0,
+            longest_streak=1 if goal_met_today else 0,
             total_steps=body.steps,
             health_score=100,
             rations="Filling",
             pace="Steady",
-            day_on_trail=0,
+            day_on_trail=1,
         )
         db.add(stats)
-    
+
     db.commit()
     
     return SyncResponse(

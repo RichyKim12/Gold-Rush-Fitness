@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Platform } from "react-native";
+import { syncHealthData } from "../services/api";
 
 const stepCount = "HKQuantityTypeIdentifierStepCount" as const;
 
@@ -69,9 +70,25 @@ const useHealthData = (date: Date) => {
 
         // sumQuantity contains { quantity: number, unit: string }
         const total = result?.sumQuantity?.quantity ?? 0;
+        const realSteps = Math.round(total);
 
-        setSteps(Math.round(total));
+        setSteps(realSteps);
         setError(null);
+
+        // ─── Auto-sync real steps to PostgreSQL ──────────────────────────
+        try {
+          const logDate = start.toISOString().split("T")[0]; // "YYYY-MM-DD"
+          await syncHealthData({
+            log_date: logDate,
+            steps: realSteps,
+            hydration_ml: 0,
+            source: "healthkit",
+          });
+          console.log(`✅ Synced ${realSteps} steps for ${logDate} to backend`);
+        } catch (syncErr: any) {
+          // Don't block the UI if sync fails — just log it
+          console.warn("Step sync to backend failed:", syncErr?.message ?? syncErr);
+        }
       } catch (err: any) {
         const msg =
           err?.message ?? err?.localizedDescription ?? String(err);

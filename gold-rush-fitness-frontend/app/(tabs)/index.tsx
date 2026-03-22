@@ -1,5 +1,5 @@
 // app/(tabs)/index.tsx
-import React from 'react';
+import React, { useState, useCallback } from 'react';
 import {
   View,
   Text,
@@ -7,6 +7,12 @@ import {
   StyleSheet,
   TouchableOpacity,
   StatusBar,
+  Modal,
+  TextInput,
+  Alert,
+  KeyboardAvoidingView,
+  Platform,
+  RefreshControl,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useTheme } from '../../context/ThemeContext';
@@ -17,11 +23,38 @@ import StepRing from '../../components/StepRing';
 import WeekHeatmap from '../../components/WeekHeatmap';
 import { useRouter } from 'expo-router';
 import { TrailIcon, StreakIcon, PinIcon, TrophyIcon, DehydrationIcon, HealthIcon } from '../../components/PixelIcons';
+import useHealthData from '../../hooks/useHealthData';
+import { useHydration } from '../../context/HydrationContext';
 
 export default function HomeScreen() {
   const router = useRouter();
   const { colors } = useTheme();
   const { state, isLoading, error } = useAppData();
+  const { steps: realSteps } = useHealthData(new Date());
+  const { ozLogged, addOz } = useHydration();
+  const [hydrationModalVisible, setHydrationModalVisible] = useState(false);
+  const [hydrationInput, setHydrationInput] = useState('');
+  const [refreshing, setRefreshing] = useState(false);
+
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    setTimeout(() => setRefreshing(false), 1000);
+  }, []);
+
+  const logWater = (oz: number) => {
+    addOz(oz);
+    setHydrationModalVisible(false);
+    setHydrationInput('');
+  };
+
+  const logCustomWater = () => {
+    const oz = parseInt(hydrationInput);
+    if (!oz || oz <= 0) {
+      Alert.alert('Invalid amount', 'Please enter a valid number of oz.');
+      return;
+    }
+    logWater(oz);
+  };
 
   // Guard against loading state — don't check for zero values
   if (isLoading || error) {
@@ -58,13 +91,21 @@ export default function HomeScreen() {
       <ScrollView
         contentContainerStyle={s.scroll}
         showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            tintColor={colors.gold}
+            colors={[colors.gold]}
+          />
+        }
       >
         {/* Header */}
         <View style={s.header}>
           <View>
             <View style={s.eyebrowRow}>
               <TrailIcon size={14} />
-              <Text style={s.eyebrow}>Day 39 on the Trail</Text>
+              <Text style={s.eyebrow}>Day {Math.max(1, state.dayOnTrail)} on the Trail</Text>
             </View>
             <Text style={s.title}>
               {state.playerName}'s{'\n'}Wagon Party
@@ -144,7 +185,7 @@ export default function HomeScreen() {
           <View style={s.stepsCard}>
             <Text style={s.cardTitle}>TODAY'S MARCH</Text>
             <View style={{ alignItems: 'center' }}>
-              <StepRing steps={state.todaySteps} />
+              <StepRing steps={realSteps} />
             </View>
             <TouchableOpacity
               style={[s.logButton, { alignSelf: 'flex-end' }]}
@@ -189,14 +230,58 @@ export default function HomeScreen() {
               </View>
             )}
 
-            <TouchableOpacity style={s.logButton} onPress={() => router.push('/health')}>
+            {ozLogged > 0 && (
+              <Text style={[s.hydrationStatLabel, { color: colors.trailGold, textAlign: 'center', marginBottom: 6 }]}>
+                +{ozLogged} oz logged today
+              </Text>
+            )}
+            <TouchableOpacity style={s.logButton} onPress={() => setHydrationModalVisible(true)}>
               <Text style={s.logButtonText}>Log Water →</Text>
             </TouchableOpacity>
           </TouchableOpacity>
         </View>
 
+        {/* Hydration Modal */}
+        <Modal visible={hydrationModalVisible} transparent animationType="slide" onRequestClose={() => setHydrationModalVisible(false)}>
+          <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={s.modalOverlay}>
+            <View style={[s.modalBox, { backgroundColor: '#2a1f0e', borderWidth: 1, borderColor: colors.gold }]}>
+              <Text style={[s.modalTitle, { color: colors.gold, fontFamily: 'PressStart2P_400Regular' }]}>Log Water</Text>
+              <Text style={[s.modalSubtitle, { color: colors.parchment, fontFamily: 'PressStart2P_400Regular' }]}>Tap preset or enter oz</Text>
+
+              <View style={s.presetRow}>
+                {[8, 12, 16, 24].map(oz => (
+                  <TouchableOpacity key={oz} style={[s.presetBtn, { borderColor: colors.gold, backgroundColor: '#3a2d1a' }]} onPress={() => logWater(oz)}>
+                    <Text style={[s.presetBtnText, { color: colors.gold, fontFamily: 'PressStart2P_400Regular' }]}>{oz}</Text>
+                    <Text style={[s.presetBtnText, { color: colors.parchment, fontSize: 8, fontFamily: 'PressStart2P_400Regular' }]}>oz</Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+
+              <TextInput
+                style={[s.hydrationInput, { color: '#fff', borderColor: colors.gold, backgroundColor: '#1a1206', fontFamily: undefined }]}
+                placeholder="Custom oz"
+                placeholderTextColor="#888"
+                keyboardType="number-pad"
+                returnKeyType="done"
+                value={hydrationInput}
+                onChangeText={setHydrationInput}
+                onSubmitEditing={logCustomWater}
+              />
+
+              <View style={s.modalButtons}>
+                <TouchableOpacity style={[s.modalBtn, { backgroundColor: colors.gold }]} onPress={logCustomWater}>
+                  <Text style={[s.modalBtnText, { color: '#1a1206' }]}>Log</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={[s.modalBtn, { backgroundColor: 'transparent', borderColor: '#888', borderWidth: 1 }]} onPress={() => { setHydrationModalVisible(false); setHydrationInput(''); }}>
+                  <Text style={[s.modalBtnText, { color: '#aaa' }]}>Cancel</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </KeyboardAvoidingView>
+        </Modal>
+
         {/* WEEK HEATMAP */}
-        <WeekHeatmap history={state.weekHistory} />
+        {/* <WeekHeatmap history={state.weekHistory} /> */}
 
         {/* REWARDS PREVIEW */}
         <TouchableOpacity
@@ -481,6 +566,67 @@ function makeStyles(colors: ReturnType<typeof useTheme>['colors']) {
     logButtonText: {
       color: colors.trailGold,
       fontSize: 10,
+    },
+    modalOverlay: {
+      flex: 1,
+      backgroundColor: 'rgba(0,0,0,0.7)',
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    modalBox: {
+      width: '85%',
+      borderRadius: 12,
+      padding: 24,
+    },
+    modalTitle: {
+      fontSize: 18,
+      fontWeight: 'bold',
+      marginBottom: 4,
+      textAlign: 'center',
+    },
+    modalSubtitle: {
+      fontSize: 13,
+      marginBottom: 20,
+      textAlign: 'center',
+    },
+    presetRow: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      marginBottom: 16,
+      gap: 8,
+    },
+    presetBtn: {
+      flex: 1,
+      borderWidth: 1,
+      borderRadius: 8,
+      paddingVertical: 10,
+      alignItems: 'center',
+    },
+    presetBtnText: {
+      fontSize: 13,
+      fontWeight: '600',
+    },
+    hydrationInput: {
+      borderWidth: 1,
+      borderRadius: 8,
+      paddingHorizontal: 12,
+      paddingVertical: 10,
+      fontSize: 15,
+      marginBottom: 16,
+    },
+    modalButtons: {
+      flexDirection: 'row',
+      gap: 10,
+    },
+    modalBtn: {
+      flex: 1,
+      borderRadius: 8,
+      paddingVertical: 12,
+      alignItems: 'center',
+    },
+    modalBtnText: {
+      fontSize: 15,
+      fontWeight: '600',
     },
     rewardsPreview: {
       backgroundColor: colors.bgCard,
