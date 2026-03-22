@@ -99,12 +99,12 @@ class UserAchievement(Base):
 
 def init_default_achievements(db):
     default_achievements = [
-        {"badge_id": "first_steps", "name": "First Steps", "description": "Complete your first step goal", "icon": "\u{1F6B6}", "tier_requirement": 1},
-        {"badge_id": "rest_stop_master", "name": "Rest Stop Master", "description": "Reach 3,000 steps", "icon": "\u{1F3DE}", "tier_requirement": 1},
-        {"badge_id": "halfway_there", "name": "Halfway There", "description": "Reach 6,000 steps", "icon": "\u{1F3DE}\u{1F3DE}", "tier_requirement": 2},
-        {"badge_id": "journey_complete", "name": "Journey Complete", "description": "Reach 10,000 steps - the full trail!", "icon": "\u{1F3F3}", "tier_requirement": 3},
-        {"badge_id": "week_warrior", "name": "Week Warrior", "description": "Complete 7 days of goals", "icon": "\u{1F525}", "tier_requirement": 3},
-        {"badge_id": "hydration_hero", "name": "Hydration Hero", "description": "Log 2000ml of water in one day", "icon": "\u{1F4A7}", "tier_requirement": 1},
+        {"badge_id": "first_steps", "name": "First Steps", "description": "Complete your first step goal", "icon": "\U0001F6B6", "tier_requirement": 1},
+        {"badge_id": "rest_stop_master", "name": "Rest Stop Master", "description": "Reach 3,000 steps", "icon": "\U0001F3DE", "tier_requirement": 1},
+        {"badge_id": "halfway_there", "name": "Halfway There", "description": "Reach 6,000 steps", "icon": "\U0001F3DE\U0001F3DE", "tier_requirement": 2},
+        {"badge_id": "journey_complete", "name": "Journey Complete", "description": "Reach 10,000 steps - the full trail!", "icon": "\U0001F3F3", "tier_requirement": 3},
+        {"badge_id": "week_warrior", "name": "Week Warrior", "description": "Complete 7 days of goals", "icon": "\U0001F525", "tier_requirement": 3},
+        {"badge_id": "hydration_hero", "name": "Hydration Hero", "description": "Log 2000ml of water in one day", "icon": "\U0001F4A7", "tier_requirement": 1},
     ]
     
     for ach in default_achievements:

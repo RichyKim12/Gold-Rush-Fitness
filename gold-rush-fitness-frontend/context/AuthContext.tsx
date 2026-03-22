@@ -43,21 +43,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       try {
         const token = await api.getToken();
         if (token) {
-          // Validate token is still good by hitting /dashboard
-          try {
-            const dashboard = await api.getDashboard();
-            setState({
-              token,
-              userId: null,
-              displayName: dashboard.display_name,
-              isLoggedIn: true,
-              isLoading: false,
-            });
-          } catch {
-            // Token expired or invalid — clear it
-            await api.clearToken();
-            setState(prev => ({ ...prev, isLoggedIn: false, isLoading: false }));
-          }
+          setState({
+            token,
+            userId: null,
+            displayName: null,
+            isLoggedIn: true,
+            isLoading: false,
+          });
         } else {
           setState(prev => ({ ...prev, isLoading: false }));
         }

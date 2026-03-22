@@ -191,10 +191,17 @@ def sync_health_data(
         db.flush()
     
     stats = db.query(UserStats).filter(UserStats.user_id == current_user.id).first()
-    
+
+    # Recalculate total_steps from ALL daily logs (avoids double-counting on repeated syncs)
+    from sqlalchemy import func as sqlfunc
+    total_steps_result = db.query(sqlfunc.sum(DailyLog.steps)).filter(
+        DailyLog.user_id == current_user.id
+    ).scalar()
+    real_total = int(total_steps_result or 0)
+
     if stats:
-        stats.total_steps += body.steps
-        stats.trail_miles = stats.total_steps // 2000
+        stats.total_steps = real_total
+        stats.trail_miles = real_total // 2000
     else:
         stats = UserStats(
             user_id=current_user.id,

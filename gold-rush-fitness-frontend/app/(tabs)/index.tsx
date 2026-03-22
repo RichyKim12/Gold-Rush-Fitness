@@ -17,11 +17,13 @@ import StepRing from '../../components/StepRing';
 import WeekHeatmap from '../../components/WeekHeatmap';
 import { useRouter } from 'expo-router';
 import { TrailIcon, StreakIcon, PinIcon, TrophyIcon, DehydrationIcon, HealthIcon } from '../../components/PixelIcons';
+import useHealthData from '../../hooks/useHealthData';
 
 export default function HomeScreen() {
   const router = useRouter();
   const { colors } = useTheme();
   const { state, isLoading, error } = useAppData();
+  const { steps: realSteps } = useHealthData(new Date());
 
   // Guard against loading state — don't check for zero values
   if (isLoading || error) {
@@ -144,7 +146,7 @@ export default function HomeScreen() {
           <View style={s.stepsCard}>
             <Text style={s.cardTitle}>TODAY'S MARCH</Text>
             <View style={{ alignItems: 'center' }}>
-              <StepRing steps={state.todaySteps} />
+              <StepRing steps={realSteps} />
             </View>
             <TouchableOpacity
               style={[s.logButton, { alignSelf: 'flex-end' }]}
@@ -196,7 +198,7 @@ export default function HomeScreen() {
         </View>
 
         {/* WEEK HEATMAP */}
-        <WeekHeatmap history={state.weekHistory} />
+        {/* <WeekHeatmap history={state.weekHistory} /> */}
 
         {/* REWARDS PREVIEW */}
         <TouchableOpacity
