@@ -75,6 +75,8 @@ backend/server/
 | email | VARCHAR(255) | Unique email |
 | password_hash | VARCHAR(255) | Bcrypt hashed password |
 | display_name | VARCHAR(100) | User's display name |
+| vitality | INTEGER | Current vitality stat (starts at 10) |
+| vitality_max | INTEGER | Maximum vitality (default 10) |
 | created_at | TIMESTAMP | Account creation time |
 
 ### daily_logs
