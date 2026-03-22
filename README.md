@@ -1,9 +1,3 @@
----
-noteId: "63213d5025e411f1bc473199fa69d114"
-tags: []
-
----
-
 # Gold Rush Fitness
 
 > **HoosHack 2025 — Health and Wellness Category**
