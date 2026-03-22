@@ -7,6 +7,7 @@ from health_tracker.models.health_log import HealthLog
 from health_tracker.schemas.schemas import SyncRequest, SyncResponse
 from health_tracker.services.auth_service import get_current_user
 from health_tracker.services.streak_engine import process_sync
+from health_tracker.services.vitality_engine import process_user_vitality
 
 router = APIRouter(tags=["health"])
 
@@ -17,6 +18,10 @@ async def sync_health_data(
     user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
+    if process_user_vitality(db, user):
+        db.commit()
+        db.refresh(user)
+
     # Idempotent upsert — one row per (user_id, log_date)
     log = (
         db.query(HealthLog)
