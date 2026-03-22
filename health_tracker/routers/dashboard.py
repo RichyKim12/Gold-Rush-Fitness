@@ -11,13 +11,13 @@ from health_tracker.models.streak import Streak
 from health_tracker.models.achievement import UserAchievement, ACHIEVEMENTS
 from health_tracker.schemas.schemas import (
     DashboardResponse,
-    StreakInfo,
     AchievementsResponse,
     AchievementOut,
     HistoryResponse,
     DayRecord,
 )
 from health_tracker.services.auth_service import get_current_user
+from health_tracker.services.vitality_engine import process_user_vitality
 
 router = APIRouter(tags=["dashboard"])
 
@@ -29,17 +29,29 @@ async def get_dashboard(
     db: Session = Depends(get_db),
 ):
     """Comprehensive dashboard for frontend with all required fields."""
+    if process_user_vitality(db, user):
+        db.commit()
+        db.refresh(user)
+
     today = date.today()
     start_date = today - timedelta(days=6)  # 7 days including today
 
     # Today's health log
-    log = db.query(HealthLog).filter_by(user_id=user.id, log_date=today).first()
+    log = (
+        db.query(HealthLog)
+        .filter_by(user_id=user.id, log_date=today)
+        .first()
+    )
     today_steps = log.steps if log else 0
 
     # Lifetime total steps
-    total_steps_result = db.query(func.coalesce(func.sum(HealthLog.steps), 0)).filter_by(user_id=user.id).scalar()
+    total_steps_result = (
+        db.query(func.coalesce(func.sum(HealthLog.steps), 0))
+        .filter_by(user_id=user.id)
+        .scalar()
+    )
     total_steps = int(total_steps_result)
-    
+
     # Trail miles (every 2000 steps = 1 mile)
     trail_miles = total_steps // 2000
 
@@ -54,7 +66,7 @@ async def get_dashboard(
         .order_by(HealthLog.log_date)
         .all()
     )
-    
+
     log_by_date = {log.log_date: log for log in logs}
     week_history = []
     for i in range(7):
@@ -78,13 +90,8 @@ async def get_dashboard(
         (s.longest_streak for s in streaks if s.metric == "steps"), 0
     )
 
-    # Health score (percentage of days with goal met in last 7 days)
-    # New users with no activity should start at full vitality.
-    if total_steps == 0:
-        health_score = 100
-    else:
-        days_met = sum(1 for r in week_history if r.goalMet)
-        health_score = int((days_met / 7) * 100)
+    # Health screen reads healthScore as vitality, so use persisted vitality.
+    health_score = user.vitality if user.vitality is not None else 100
 
     # Unlocked rewards (mock for now)
     earned = db.query(UserAchievement).filter_by(user_id=user.id).all()
@@ -103,8 +110,10 @@ async def get_dashboard(
         healthScore=health_score,
         rations="Filling",
         pace="Steady",
-        vitality=100,
-        vitalityMax=100,
+        vitality=user.vitality if user.vitality is not None else 100,
+        vitalityMax=(
+            user.vitality_max if user.vitality_max is not None else 100
+        ),
         dayOnTrail=user.day_on_trail or 0,
     )
 
@@ -115,7 +124,8 @@ async def get_history(
     user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
-    """Return recent daily logs for the frontend week heatmap and trail progress."""
+    """Return recent daily logs for the frontend week heatmap.
+    """
     today = date.today()
     start_date = today - timedelta(days=days - 1)
 
