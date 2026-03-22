@@ -51,25 +51,30 @@ class StreakInfo(BaseModel):
     last_active_date: Optional[date] = None
 
 
-class DashboardResponse(BaseModel):
-    log_date: date
-    steps: int
-    hydration_ml: float
-    step_goal: int
-    hydration_goal_ml: float
-    steps_met: bool
-    hydration_met: bool
-    streaks: list[StreakInfo]
-    display_name: Optional[str] = None
-    total_steps: int = 0
-
-
-# ── History ──
-
 class DayRecord(BaseModel):
     date: date
     steps: int
-    goal_met: bool
+    goalMet: bool
+
+
+class DashboardResponse(BaseModel):
+    playerName: str
+    partySize: int = 4
+    trailMiles: int
+    currentStreak: int
+    longestStreak: int
+    totalSteps: int
+    todaySteps: int
+    weekHistory: list[DayRecord]
+    unlockedRewards: list[str] = []
+    healthScore: int = 100
+    rations: str = "Filling"
+    pace: str = "Steady"
+    vitality: int = 100
+    vitalityMax: int = 100
+
+
+# ── History ──
 
 
 class HistoryResponse(BaseModel):

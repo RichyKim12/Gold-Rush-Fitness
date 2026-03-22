@@ -11,7 +11,7 @@ import {
 import { LinearGradient } from 'expo-linear-gradient';
 import { useTheme } from '../../context/ThemeContext';
 import { MILESTONES, TRAIL_TOTAL_MILES } from '../../constants/theme';
-import { MOCK_STATE } from '../../constants/mockData';
+import { useAppData } from '../../hooks/useAppData';
 import WagonScene from '../../components/WagonScene';
 import HealthBar from '../../components/HealthBar';
 import StepRing from '../../components/StepRing';
@@ -22,7 +22,19 @@ import { useRouter } from 'expo-router';
 export default function HomeScreen() {
   const router = useRouter();
   const { colors } = useTheme();
-  const state = MOCK_STATE;
+  const { state, isLoading, error } = useAppData();
+
+  // Guard against loading state — don't check for zero values
+  if (isLoading || error) {
+    return (
+      <LinearGradient
+        colors={[colors.gradientTop, colors.gradientBottom]}
+        style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}
+      >
+        <Text style={{ color: colors.parchment, fontSize: 14 }}>{error || 'Loading trail data...'}</Text>
+      </LinearGradient>
+    );
+  }
 
   const progressPercent = (state.trailMiles / TRAIL_TOTAL_MILES) * 100;
   const nextMilestone = MILESTONES.find((m) => m.mile > state.trailMiles) || MILESTONES[MILESTONES.length - 1];
@@ -156,7 +168,7 @@ export default function HomeScreen() {
           <Text style={s.tipIcon}>📜</Text>
           <Text style={s.tipText}>
             "A pioneer in good health can cover 15–20 miles a day. Your{' '}
-            {10000..toLocaleString()} daily steps keep the party strong!"
+            {(10000).toLocaleString()} daily steps keep the party strong!"
           </Text>
         </View>
       </ScrollView>

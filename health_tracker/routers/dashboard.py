@@ -23,51 +23,84 @@ router = APIRouter(tags=["dashboard"])
 
 
 @router.get("/dashboard", response_model=DashboardResponse)
+@router.get("/users/me/dashboard", response_model=DashboardResponse)
 async def get_dashboard(
     user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
+    """Comprehensive dashboard for frontend with all required fields."""
     today = date.today()
+    start_date = today - timedelta(days=6)  # 7 days including today
 
-    # Today's health log (may not exist yet)
-    log = (
-        db.query(HealthLog)
-        .filter_by(user_id=user.id, log_date=today)
-        .first()
-    )
-    steps = log.steps if log else 0
-    hydration_ml = log.hydration_ml if log else 0.0
-
-    # All streaks for user
-    streaks = db.query(Streak).filter_by(user_id=user.id).all()
-    streak_infos = [
-        StreakInfo(
-            metric=s.metric,
-            current_streak=s.current_streak,
-            longest_streak=s.longest_streak,
-            last_active_date=s.last_active_date,
-        )
-        for s in streaks
-    ]
+    # Today's health log
+    log = db.query(HealthLog).filter_by(user_id=user.id, log_date=today).first()
+    today_steps = log.steps if log else 0
 
     # Lifetime total steps
-    total_steps_result = (
-        db.query(func.coalesce(func.sum(HealthLog.steps), 0))
-        .filter_by(user_id=user.id)
-        .scalar()
+    total_steps_result = db.query(func.coalesce(func.sum(HealthLog.steps), 0)).filter_by(user_id=user.id).scalar()
+    total_steps = int(total_steps_result)
+    
+    # Trail miles (every 2000 steps = 1 mile)
+    trail_miles = total_steps // 2000
+
+    # Week history (7 days)
+    logs = (
+        db.query(HealthLog)
+        .filter(
+            HealthLog.user_id == user.id,
+            HealthLog.log_date >= start_date,
+            HealthLog.log_date <= today,
+        )
+        .order_by(HealthLog.log_date)
+        .all()
+    )
+    
+    log_by_date = {log.log_date: log for log in logs}
+    week_history = []
+    for i in range(7):
+        d = start_date + timedelta(days=i)
+        log = log_by_date.get(d)
+        goal_met = (log.steps >= user.step_goal) if log else False
+        week_history.append(
+            DayRecord(
+                date=d.isoformat(),
+                steps=log.steps if log else 0,
+                goalMet=goal_met,
+            )
+        )
+
+    # Streaks
+    streaks = db.query(Streak).filter_by(user_id=user.id).all()
+    current_streak = next(
+        (s.current_streak for s in streaks if s.metric == "steps"), 0
+    )
+    longest_streak = next(
+        (s.longest_streak for s in streaks if s.metric == "steps"), 0
     )
 
+    # Health score (percentage of days with goal met in last 7 days)
+    days_met = sum(1 for r in week_history if r.goalMet)
+    health_score = int((days_met / 7) * 100)
+
+    # Unlocked rewards (mock for now)
+    earned = db.query(UserAchievement).filter_by(user_id=user.id).all()
+    unlocked_rewards = [ea.badge_id for ea in earned]
+
     return DashboardResponse(
-        log_date=today,
-        steps=steps,
-        hydration_ml=hydration_ml,
-        step_goal=user.step_goal,
-        hydration_goal_ml=user.hydration_goal_ml,
-        steps_met=steps >= user.step_goal,
-        hydration_met=hydration_ml >= user.hydration_goal_ml,
-        streaks=streak_infos,
-        display_name=user.display_name,
-        total_steps=int(total_steps_result),
+        playerName=user.display_name or "Pioneer",
+        partySize=4,
+        trailMiles=trail_miles,
+        currentStreak=current_streak,
+        longestStreak=longest_streak,
+        totalSteps=total_steps,
+        todaySteps=today_steps,
+        weekHistory=week_history,
+        unlockedRewards=unlocked_rewards,
+        healthScore=health_score,
+        rations="Filling",
+        pace="Steady",
+        vitality=100,
+        vitalityMax=100,
     )
 
 

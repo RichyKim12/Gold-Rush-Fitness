@@ -12,15 +12,26 @@ import {
 import { LinearGradient } from 'expo-linear-gradient';
 import { useTheme } from '../../context/ThemeContext';
 import { DAILY_STEP_GOAL, TRAIL_TOTAL_MILES } from '../../constants/theme';
-import { MOCK_STATE } from '../../constants/mockData';
+import { useAppData } from '../../hooks/useAppData';
 import StepRing from '../../components/StepRing';
 import WeekHeatmap from '../../components/WeekHeatmap';
 
 export default function StepsScreen() {
   const { colors } = useTheme();
-  const state = MOCK_STATE;
+  const { state, isLoading, error } = useAppData();
   const [selectedGoal, setSelectedGoal] = useState(DAILY_STEP_GOAL);
   const [showInfo, setShowInfo] = useState(false);
+
+  if (isLoading || error) {
+    return (
+      <LinearGradient
+        colors={[colors.gradientTop, colors.gradientBottom]}
+        style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}
+      >
+        <Text style={{ color: colors.parchment, fontSize: 14 }}>{error || 'Loading step data...'}</Text>
+      </LinearGradient>
+    );
+  }
 
   const goals = [6000, 8000, 10000, 12000, 15000];
   const milesEarned = Math.floor(state.todaySteps / 2000);

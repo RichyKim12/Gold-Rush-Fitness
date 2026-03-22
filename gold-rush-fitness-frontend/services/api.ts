@@ -1,10 +1,21 @@
 // services/api.ts — API client connecting the Expo frontend to the FastAPI backend
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import Constants from 'expo-constants';
+import { Platform } from 'react-native';
 
 // ─── Configuration ───────────────────────────────────────────────────────────
-// In development, point to your local FastAPI server.
-// For physical devices, replace localhost with your machine's IP.
-const BASE_URL = process.env.EXPO_PUBLIC_API_URL || 'http://172.25.147.19:8000';
+function getBaseUrl(): string {
+  if (process.env.EXPO_PUBLIC_API_URL) {
+    return process.env.EXPO_PUBLIC_API_URL;
+  }
+  const hostUri = Constants.expoConfig?.hostUri;
+  const host = hostUri?.split(':')[0];
+  if (host) return `http://${host}:8000`;
+  if (Platform.OS === 'android') return 'http://10.0.2.2:8000';
+  return 'http://127.0.0.1:8000';
+}
+
+const BASE_URL = getBaseUrl();
 
 const AUTH_TOKEN_KEY = 'auth_token';
 const USER_ID_KEY = 'user_id';
@@ -14,67 +25,45 @@ const USER_ID_KEY = 'user_id';
 export interface AuthResponse {
   access_token: string;
   token_type: string;
-  user_id: string;
-  display_name: string | null;
+  user_id: number;
+  display_name: string;
 }
 
-export interface SyncRequest {
-  log_date: string;     // "2026-03-21"
-  steps: number;
-  hydration_ml: number;
-  source: 'healthkit' | 'health_connect' | 'manual';
+export interface TierDetail {
+  tierId: number;
+  threshold: number;
+  label: string;
+  isCompleted: boolean;
 }
 
-export interface SyncResponse {
-  status: string;
-  log_date: string;
-  steps: number;
-  hydration_ml: number;
-  new_badges: string[];
-}
-
-export interface StreakInfo {
-  metric: string;       // "steps" | "hydration" | "combined"
-  current_streak: number;
-  longest_streak: number;
-  last_active_date: string | null;
-}
-
-export interface DashboardResponse {
-  log_date: string;
-  steps: number;
-  hydration_ml: number;
-  step_goal: number;
-  hydration_goal_ml: number;
-  steps_met: boolean;
-  hydration_met: boolean;
-  streaks: StreakInfo[];
-  display_name: string | null;
-  total_steps: number;
+export interface TodayGoalProgress {
+  completedTiers: number;
+  totalTiers: number;
+  tierDetails: TierDetail[];
 }
 
 export interface DayRecord {
   date: string;
   steps: number;
-  goal_met: boolean;
+  goalMet: boolean;
 }
 
-export interface HistoryResponse {
-  days: DayRecord[];
-  total_steps: number;
-  trail_miles: number;
-}
-
-export interface AchievementOut {
-  badge_id: string;
-  name: string;
-  description: string;
-  emoji: string;
-  earned_at: string;
-}
-
-export interface AchievementsResponse {
-  achievements: AchievementOut[];
+export interface DashboardResponse {
+  playerName: string;
+  partySize: number;
+  trailMiles: number;
+  currentStreak: number;
+  longestStreak: number;
+  totalSteps: number;
+  todaySteps: number;
+  weekHistory: DayRecord[];
+  unlockedRewards: string[];
+  healthScore: number;
+  rations: 'Filling' | 'Meager' | 'Bare Bones';
+  pace: 'Grueling' | 'Strenuous' | 'Steady' | 'Leisurely';
+  vitality: number;
+  vitalityMax: number;
+  todayGoalProgress: TodayGoalProgress;
 }
 
 // ─── Token Management ────────────────────────────────────────────────────────
@@ -125,16 +114,28 @@ async function request<T>(
     headers['Authorization'] = `Bearer ${token}`;
   }
 
-  const res = await fetch(`${BASE_URL}${path}`, {
-    ...options,
-    headers,
-  });
+  let res: Response;
+  try {
+    res = await fetch(`${BASE_URL}${path}`, {
+      ...options,
+      headers,
+    });
+  } catch {
+    throw new ApiError(
+      0,
+      `Network request failed. Check API server and EXPO_PUBLIC_API_URL (current: ${BASE_URL}).`,
+    );
+  }
 
   if (!res.ok) {
     let detail = `HTTP ${res.status}`;
     try {
       const body = await res.json();
-      detail = body.detail || detail;
+      if (Array.isArray(body.detail)) {
+        detail = body.detail.map((e: any) => e.msg).join(', ');
+      } else {
+        detail = body.detail || detail;
+      }
     } catch {}
     throw new ApiError(res.status, detail);
   }
@@ -155,11 +156,10 @@ export async function register(
       email,
       password,
       display_name: displayName || null,
-      timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
     }),
   });
 
-  await saveToken(data.access_token, data.user_id);
+  await saveToken(data.access_token, String(data.user_id));
   return data;
 }
 
@@ -172,7 +172,7 @@ export async function login(
     body: JSON.stringify({ email, password }),
   });
 
-  await saveToken(data.access_token, data.user_id);
+  await saveToken(data.access_token, String(data.user_id));
   return data;
 }
 
@@ -182,24 +182,8 @@ export async function logout(): Promise<void> {
 
 // ─── Authenticated Endpoints ─────────────────────────────────────────────────
 
-export async function syncHealthData(body: SyncRequest): Promise<SyncResponse> {
-  return request<SyncResponse>(
-    '/sync',
-    { method: 'POST', body: JSON.stringify(body) },
-    true,
-  );
-}
-
 export async function getDashboard(): Promise<DashboardResponse> {
-  return request<DashboardResponse>('/dashboard', {}, true);
-}
-
-export async function getHistory(days = 7): Promise<HistoryResponse> {
-  return request<HistoryResponse>(`/history?days=${days}`, {}, true);
-}
-
-export async function getAchievements(): Promise<AchievementsResponse> {
-  return request<AchievementsResponse>('/achievements', {}, true);
+  return request<DashboardResponse>('/users/me/dashboard', {}, true);
 }
 
 // ─── Health Check (no auth) ──────────────────────────────────────────────────

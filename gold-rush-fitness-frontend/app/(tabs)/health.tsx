@@ -9,7 +9,7 @@ import {
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useTheme } from '../../context/ThemeContext';
-import { MOCK_STATE } from '../../constants/mockData';
+import { useAppData } from '../../hooks/useAppData';
 import HealthBar from '../../components/HealthBar';
 
 const AILMENTS = [
@@ -21,7 +21,18 @@ const AILMENTS = [
 
 export default function HealthScreen() {
   const { colors } = useTheme();
-  const state = MOCK_STATE;
+  const { state, isLoading, error } = useAppData();
+
+  if (isLoading || error) {
+    return (
+      <LinearGradient
+        colors={[colors.gradientTop, colors.gradientBottom]}
+        style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}
+      >
+        <Text style={{ color: colors.parchment, fontSize: 14 }}>{error || 'Loading health data...'}</Text>
+      </LinearGradient>
+    );
+  }
 
   const daysHit = state.weekHistory.filter((d) => d.goalMet).length;
   const consistency = Math.round((daysHit / 7) * 100);
