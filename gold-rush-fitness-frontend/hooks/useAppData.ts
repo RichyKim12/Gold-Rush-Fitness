@@ -9,6 +9,7 @@ interface UseAppDataReturn {
   isLoading: boolean;
   error: string | null;
   refresh: () => Promise<void>;
+  syncHealthData: (steps: number, hydrationMl: number) => Promise<void>;
 }
 
 function mapDashboardToAppState(dashboard: api.DashboardResponse): AppState {
@@ -67,9 +68,31 @@ export function useAppData(): UseAppDataReturn {
     }
   }, []);
 
+  const syncHealthData = useCallback(async (steps: number, hydrationMl: number) => {
+    try {
+      const today = new Date().toISOString().split('T')[0];
+      const syncResponse = await api.syncHealthData({
+        log_date: today,
+        steps: steps,
+        hydration_ml: hydrationMl,
+        source: 'manual',
+      });
+      
+      setState(prev => ({
+        ...prev,
+        todaySteps: syncResponse.steps,
+        healthScore: Math.max(0, prev.healthScore + syncResponse.vitality_change),
+      }));
+      
+      await refresh();
+    } catch (err: any) {
+      console.error('Failed to sync health data:', err);
+    }
+  }, [refresh]);
+
   useEffect(() => {
     refresh();
   }, [refresh]);
 
-  return { state, isLoading, error, refresh };
+  return { state, isLoading, error, refresh, syncHealthData };
 }

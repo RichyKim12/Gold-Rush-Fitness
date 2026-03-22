@@ -187,6 +187,28 @@ export async function getDashboard(): Promise<DashboardResponse> {
   return request<DashboardResponse>('/users/me/dashboard', {}, true);
 }
 
+export interface SyncRequest {
+  log_date: string;
+  steps: number;
+  hydration_ml: number;
+  source: string;
+}
+
+export interface SyncResponse {
+  status: string;
+  steps: number;
+  hydration_ml: number;
+  vitality_change: number;
+  new_vitality: number;
+}
+
+export async function syncHealthData(body: SyncRequest): Promise<SyncResponse> {
+  return request<SyncResponse>('/users/sync', {
+    method: 'POST',
+    body: JSON.stringify(body),
+  }, true);
+}
+
 // ─── Health Check (no auth) ──────────────────────────────────────────────────
 
 export async function healthCheck(): Promise<{ status: string }> {
